@@ -8,7 +8,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
-public class ClienteVista extends JFrame {
+public class ClienteVista extends JPanel {
     private ClienteControlador controlador;
     private JTextField txtNombre;
     private JTextField txtTelefono;
@@ -17,10 +17,6 @@ public class ClienteVista extends JFrame {
 
     public ClienteVista(ClienteControlador controlador) {
         this.controlador = controlador;
-        setTitle("Gestión de Clientes");
-        setSize(700, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
         initComponents();
     }
 
@@ -92,7 +88,7 @@ public class ClienteVista extends JFrame {
         }
     }
 
-    public void mostrar() {
-        setVisible(true);
+    public void actualizarDatos() {
+        actualizarTabla();
     }
 }

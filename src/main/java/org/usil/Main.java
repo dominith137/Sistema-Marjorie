@@ -1,12 +1,15 @@
 package org.usil;
 
-import org.usil.Controlador.ClienteControlador;
-import org.usil.Vista.ClienteVista;
+import org.usil.Controlador.MenuPrincipalControlador;
+import org.usil.Vista.MenuPrincipalVista;
 
 public class Main {
     public static void main(String[] args) {
-        ClienteControlador controlador = new ClienteControlador();
-        ClienteVista vista = new ClienteVista(controlador);
+        // Crear controlador principal
+        MenuPrincipalControlador controlador = new MenuPrincipalControlador();
+        
+        // Crear y mostrar vista principal
+        MenuPrincipalVista vista = new MenuPrincipalVista(controlador);
         vista.mostrar();
     }
 }
