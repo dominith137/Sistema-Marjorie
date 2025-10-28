@@ -6,7 +6,6 @@ import org.usil.Modelo.Servicio;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.math.BigDecimal;
 import java.util.List;
 
 public class ServicioVistaPanel extends JPanel {
@@ -66,7 +65,7 @@ public class ServicioVistaPanel extends JPanel {
             
             if (!nombre.isEmpty() && !precioStr.isEmpty() && !duracionStr.isEmpty()) {
                 try {
-                    BigDecimal precio = new BigDecimal(precioStr);
+                    double precio = Double.parseDouble(precioStr);
                     int duracion = Integer.parseInt(duracionStr);
                     
                     if (controlador.agregarServicio(nombre, descripcion, precio, duracion)) {

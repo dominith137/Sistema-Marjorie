@@ -1,16 +1,15 @@
 package org.usil.Modelo;
 
-import java.math.BigDecimal;
 
 public class Servicio {
     private int id;
     private String nombre;
     private String descripcion;
-    private BigDecimal precio;
+    private double precio;
     private int duracionMinutos;
     private boolean activo;
 
-    public Servicio(int id, String nombre, String descripcion, BigDecimal precio, int duracionMinutos) {
+    public Servicio(int id, String nombre, String descripcion, double precio, int duracionMinutos) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -23,7 +22,7 @@ public class Servicio {
     public int getId() { return id; }
     public String getNombre() { return nombre; }
     public String getDescripcion() { return descripcion; }
-    public BigDecimal getPrecio() { return precio; }
+    public double getPrecio() { return precio; }
     public int getDuracionMinutos() { return duracionMinutos; }
     public boolean isActivo() { return activo; }
 
@@ -36,7 +35,7 @@ public class Servicio {
         this.descripcion = descripcion;
     }
 
-    public void setPrecio(BigDecimal precio) {
+    public void setPrecio(double precio) {
         this.precio = precio;
     }
 
@@ -48,7 +47,7 @@ public class Servicio {
         this.activo = activo;
     }
 
-    // Método para desactivar servicio (soft delete)
+    // Método para desactivar servicio
     public void desactivar() {
         this.activo = false;
     }

@@ -1,22 +1,20 @@
 package org.usil.Controlador;
 
 import org.usil.Modelo.Servicio;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ServicioControlador {
     private List<Servicio> listaServicios = new ArrayList<>();
     private int contadorId = 1;
 
     // Agregar servicio
-    public boolean agregarServicio(String nombre, String descripcion, BigDecimal precio, int duracionMinutos) {
+    public boolean agregarServicio(String nombre, String descripcion, double precio, int duracionMinutos) {
         // Validaciones
         if (nombre == null || nombre.trim().isEmpty()) {
             return false;
         }
-        if (precio == null || precio.compareTo(BigDecimal.ZERO) <= 0) {
+        if (precio <= 0) {
             return false;
         }
         if (duracionMinutos <= 0) {
