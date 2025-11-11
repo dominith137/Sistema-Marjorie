@@ -10,7 +10,7 @@ public class MenuPrincipalControlador {
         this.servicioControlador = new ServicioControlador();
 
     }
-    
+
 
     // Getters para acceso a los controladores desde otras partes del sistema
     public ClienteControlador getClienteControlador() {

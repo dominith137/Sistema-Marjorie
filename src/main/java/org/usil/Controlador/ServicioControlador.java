@@ -40,6 +40,30 @@ public class ServicioControlador {
                 .orElse(null);
     }
 
+    // Actualizar servicio
+    public boolean actualizarServicio(int id, String nombre, String descripcion, double precio, int duracionMinutos) {
+        // Validaciones
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return false;
+        }
+        if (precio <= 0) {
+            return false;
+        }
+        if (duracionMinutos <= 0) {
+            return false;
+        }
+
+        Servicio servicio = buscarServicioPorId(id);
+        if (servicio != null) {
+            servicio.setNombre(nombre.trim());
+            servicio.setDescripcion(descripcion);
+            servicio.setPrecio(precio);
+            servicio.setDuracionMinutos(duracionMinutos);
+            return true;
+        }
+        return false;
+    }
+
     // Desactivar servicio
     public boolean desactivarServicio(int id) {
         Servicio servicio = buscarServicioPorId(id);
@@ -48,6 +72,13 @@ public class ServicioControlador {
             return true;
         }
         return false;
+    }
+
+    // Obtener solo servicios activos
+    public List<Servicio> obtenerServiciosActivos() {
+        return listaServicios.stream()
+                .filter(Servicio::isActivo)
+                .toList();
     }
 
 }
