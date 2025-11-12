@@ -54,7 +54,7 @@ public class ServicioVistaPanel extends JPanel {
         btnEditar = new JButton("Editar Servicio");
         formPanel.add(btnEditar);
 
-        btnDesactivar = new JButton("Desactivar Servicio");
+        btnDesactivar = new JButton("Cambiar Estado");
         formPanel.add(btnDesactivar);
 
         btnCancelar = new JButton("Cancelar");
@@ -138,28 +138,32 @@ public class ServicioVistaPanel extends JPanel {
             limpiarFormulario();
         });
 
-        // Acción del botón Desactivar
+        // Acción del botón Cambiar Estado
         btnDesactivar.addActionListener(e -> {
             int filaSeleccionada = tablaServicios.getSelectedRow();
             if (filaSeleccionada != -1) {
                 int id = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
                 String nombre = (String) modeloTabla.getValueAt(filaSeleccionada, 1);
+                String estadoActual = (String) modeloTabla.getValueAt(filaSeleccionada, 5);
+                boolean estaActivo = estadoActual.equals("Activo");
                 
+                String accion = estaActivo ? "desactivar" : "activar";
                 int opcion = JOptionPane.showConfirmDialog(this, 
-                    "¿Desactivar el servicio '" + nombre + "'?", 
+                    "¿" + accion.substring(0, 1).toUpperCase() + accion.substring(1) + " el servicio '" + nombre + "'?", 
                     "Confirmar", 
                     JOptionPane.YES_NO_OPTION);
                 
                 if (opcion == JOptionPane.YES_OPTION) {
-                    if (controlador.desactivarServicio(id)) {
+                    if (controlador.alternarEstadoServicio(id)) {
                         actualizarTabla();
-                        JOptionPane.showMessageDialog(this, "Servicio desactivado");
+                        String nuevoEstado = estaActivo ? "desactivado" : "activado";
+                        JOptionPane.showMessageDialog(this, "Servicio " + nuevoEstado + " exitosamente");
                     } else {
-                        JOptionPane.showMessageDialog(this, "Error al desactivar servicio");
+                        JOptionPane.showMessageDialog(this, "Error al cambiar el estado del servicio");
                     }
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Seleccione un servicio para desactivar");
+                JOptionPane.showMessageDialog(this, "Seleccione un servicio para cambiar su estado");
             }
         });
 

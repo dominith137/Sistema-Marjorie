@@ -74,6 +74,20 @@ public class ServicioControlador {
         return false;
     }
 
+    // Alternar estado del servicio (activar/desactivar)
+    public boolean alternarEstadoServicio(int id) {
+        Servicio servicio = buscarServicioPorId(id);
+        if (servicio != null) {
+            if (servicio.isActivo()) {
+                servicio.desactivar();
+            } else {
+                servicio.reactivar();
+            }
+            return true;
+        }
+        return false;
+    }
+
     // Obtener solo servicios activos
     public List<Servicio> obtenerServiciosActivos() {
         return listaServicios.stream()
