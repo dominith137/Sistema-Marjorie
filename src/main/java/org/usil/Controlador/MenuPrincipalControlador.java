@@ -1,20 +1,40 @@
 package org.usil.Controlador;
 
+import org.usil.Modelo.GestorDatos;
+
 // Controlador principal que coordina todos los módulos del sistema
 public class MenuPrincipalControlador {
     private ClienteControlador clienteControlador;
     private ServicioControlador servicioControlador;
     private CitaControlador citaControlador;
     private ReporteControlador reporteControlador;
+    private GestorDatos gestorDatos;
 
     public MenuPrincipalControlador() {
+        // Inicializar gestor de datos
+        this.gestorDatos = new GestorDatos();
+        
         // Inicializar controladores base
         this.clienteControlador = new ClienteControlador();
         this.servicioControlador = new ServicioControlador();
         
+        // Cargar datos guardados de clientes y servicios
+        gestorDatos.cargarClientes(clienteControlador);
+        gestorDatos.cargarServicios(servicioControlador);
+        
         // Inicializar controladores que dependen de otros
         this.citaControlador = new CitaControlador(clienteControlador, servicioControlador);
         this.reporteControlador = new ReporteControlador(citaControlador);
+        
+        // Cargar citas después de inicializar el controlador
+        gestorDatos.cargarCitas(citaControlador, clienteControlador, servicioControlador);
+    }
+
+    // Guarda todos los datos en archivos
+    public void guardarDatos() {
+        gestorDatos.guardarClientes(clienteControlador);
+        gestorDatos.guardarServicios(servicioControlador);
+        gestorDatos.guardarCitas(citaControlador, clienteControlador, servicioControlador);
     }
 
     // Getters para acceso a los controladores desde otras partes del sistema
@@ -32,5 +52,9 @@ public class MenuPrincipalControlador {
 
     public ReporteControlador getReporteControlador() {
         return reporteControlador;
+    }
+
+    public GestorDatos getGestorDatos() {
+        return gestorDatos;
     }
 }
