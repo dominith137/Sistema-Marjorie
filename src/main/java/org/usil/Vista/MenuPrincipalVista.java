@@ -13,9 +13,37 @@ public class MenuPrincipalVista extends JFrame {
         this.controlador = controlador;
         setTitle("Sistema de Gestión - Salón de Belleza Marjorie Villegas");
         setSize(1000, 700);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
+        configurarCierre();
+    }
+
+    // Configura el guardado automático al cerrar la ventana
+    private void configurarCierre() {
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                int opcion = JOptionPane.showConfirmDialog(
+                    MenuPrincipalVista.this,
+                    "¿Desea guardar los datos antes de salir?",
+                    "Confirmar salida",
+                    JOptionPane.YES_NO_CANCEL_OPTION
+                );
+                
+                if (opcion == JOptionPane.YES_OPTION) {
+                    controlador.guardarDatos();
+                    JOptionPane.showMessageDialog(
+                        MenuPrincipalVista.this,
+                        "Datos guardados exitosamente"
+                    );
+                    System.exit(0);
+                } else if (opcion == JOptionPane.NO_OPTION) {
+                    System.exit(0);
+                }
+                // Si es CANCEL, no hace nada y mantiene la ventana abierta
+            }
+        });
     }
 
     private void initComponents() {
