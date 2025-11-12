@@ -12,7 +12,7 @@ public class MenuPrincipalVista extends JFrame {
     public MenuPrincipalVista(MenuPrincipalControlador controlador) {
         this.controlador = controlador;
         setTitle("Sistema de Gestión - Salón de Belleza Marjorie Villegas");
-        setSize(640, 640);
+        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         initComponents();
@@ -40,8 +40,19 @@ public class MenuPrincipalVista extends JFrame {
         ServicioVistaPanel serviciosPanel = new ServicioVistaPanel(controlador.getServicioControlador());
         tabbedPane.addTab("Servicios", serviciosPanel);
 
-        mainPanel.add(tabbedPane, BorderLayout.CENTER);
+        // Pestaña de Citas - Vista integrada
+        CitaVista citasPanel = new CitaVista(
+            controlador.getCitaControlador(),
+            controlador.getClienteControlador(),
+            controlador.getServicioControlador()
+        );
+        tabbedPane.addTab("Citas", citasPanel);
 
+        // Pestaña de Reportes - Vista integrada
+        ReporteVista reportesPanel = new ReporteVista(controlador.getReporteControlador());
+        tabbedPane.addTab("Reportes", reportesPanel);
+
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
         add(mainPanel);
     }
