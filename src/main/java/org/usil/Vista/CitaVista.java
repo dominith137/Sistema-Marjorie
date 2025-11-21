@@ -22,7 +22,7 @@ public class CitaVista extends JPanel {
     private CitaControlador controlador;
     private ClienteControlador clienteControlador;
     private ServicioControlador servicioControlador;
-    
+
     private JComboBox<String> comboCliente;
     private JComboBox<String> comboServicio;
     private JTextField txtFecha;
@@ -37,7 +37,7 @@ public class CitaVista extends JPanel {
     private JButton btnCancelar;
     private JButton btnVerAgenda;
     private JTextField txtFechaAgenda;
-    
+
     private Integer citaEditandoId = null;
     private DefaultComboBoxModel<String> modeloClientes;
     private DefaultComboBoxModel<String> modeloServicios;
@@ -52,20 +52,16 @@ public class CitaVista extends JPanel {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        // Panel principal con formulario y tabla
         JPanel panelPrincipal = new JPanel(new BorderLayout());
 
-        // Panel del formulario
         JPanel formPanel = crearFormulario();
         panelPrincipal.add(formPanel, BorderLayout.NORTH);
 
-        // Panel de agenda diaria
         JPanel agendaPanel = crearPanelAgenda();
         panelPrincipal.add(agendaPanel, BorderLayout.CENTER);
 
         add(panelPrincipal);
-        
-        // Inicializar datos
+
         actualizarComboClientes();
         actualizarComboServicios();
         actualizarTabla();
@@ -80,7 +76,6 @@ public class CitaVista extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Cliente
         gbc.gridx = 0; gbc.gridy = 0;
         form.add(new JLabel("Cliente:"), gbc);
         gbc.gridx = 1;
@@ -89,7 +84,6 @@ public class CitaVista extends JPanel {
         comboCliente.setPreferredSize(new Dimension(200, 25));
         form.add(comboCliente, gbc);
 
-        // Servicio
         gbc.gridx = 0; gbc.gridy = 1;
         form.add(new JLabel("Servicio:"), gbc);
         gbc.gridx = 1;
@@ -98,7 +92,6 @@ public class CitaVista extends JPanel {
         comboServicio.setPreferredSize(new Dimension(200, 25));
         form.add(comboServicio, gbc);
 
-        // Fecha
         gbc.gridx = 0; gbc.gridy = 2;
         form.add(new JLabel("Fecha (YYYY-MM-DD):"), gbc);
         gbc.gridx = 1;
@@ -106,7 +99,6 @@ public class CitaVista extends JPanel {
         txtFecha.setText(LocalDate.now().toString());
         form.add(txtFecha, gbc);
 
-        // Hora
         gbc.gridx = 0; gbc.gridy = 3;
         form.add(new JLabel("Hora (HH:MM):"), gbc);
         gbc.gridx = 1;
@@ -118,15 +110,13 @@ public class CitaVista extends JPanel {
         spinnerHora.setPreferredSize(new Dimension(100, 25));
         form.add(spinnerHora, gbc);
 
-        // Estado
         gbc.gridx = 0; gbc.gridy = 4;
         form.add(new JLabel("Estado:"), gbc);
         gbc.gridx = 1;
         comboEstado = new JComboBox<>(new String[]{"PROGRAMADA", "COMPLETADA", "CANCELADA"});
-        comboEstado.setEnabled(false); // Solo para visualización al editar
+        comboEstado.setEnabled(false);
         form.add(comboEstado, gbc);
 
-        // Observaciones
         gbc.gridx = 0; gbc.gridy = 5;
         form.add(new JLabel("Observaciones:"), gbc);
         gbc.gridx = 1;
@@ -134,14 +124,13 @@ public class CitaVista extends JPanel {
         txtObservaciones.setLineWrap(true);
         form.add(new JScrollPane(txtObservaciones), gbc);
 
-        // Botones
         JPanel botonesPanel = new JPanel(new FlowLayout());
         btnAgregar = new JButton("Agregar Cita");
         btnEditar = new JButton("Editar Cita");
         btnCambiarEstado = new JButton("Cambiar Estado");
         btnCancelar = new JButton("Cancelar");
         btnCancelar.setEnabled(false);
-        
+
         botonesPanel.add(btnAgregar);
         botonesPanel.add(btnEditar);
         botonesPanel.add(btnCambiarEstado);
@@ -150,7 +139,6 @@ public class CitaVista extends JPanel {
         panel.add(form, BorderLayout.CENTER);
         panel.add(botonesPanel, BorderLayout.SOUTH);
 
-        // Acciones de botones
         configurarAccionesBotones();
 
         return panel;
@@ -160,7 +148,6 @@ public class CitaVista extends JPanel {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Agenda Diaria"));
 
-        // Panel de fecha para agenda
         JPanel fechaPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         fechaPanel.add(new JLabel("Fecha:"));
         txtFechaAgenda = new JTextField(10);
@@ -169,7 +156,6 @@ public class CitaVista extends JPanel {
         btnVerAgenda = new JButton("Ver Agenda");
         fechaPanel.add(btnVerAgenda);
 
-        // Tabla de citas
         modeloTabla = new DefaultTableModel(new Object[]{"ID", "Hora", "Cliente", "Servicio", "Estado", "Observaciones"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -182,14 +168,12 @@ public class CitaVista extends JPanel {
         panel.add(fechaPanel, BorderLayout.NORTH);
         panel.add(new JScrollPane(tablaCitas), BorderLayout.CENTER);
 
-        // Acción del botón Ver Agenda
         btnVerAgenda.addActionListener(e -> actualizarAgendaDiaria());
 
         return panel;
     }
 
     private void configurarAccionesBotones() {
-        // Botón Agregar/Guardar (maneja tanto agregar como editar)
         btnAgregar.addActionListener(e -> {
             if (validarFormulario()) {
                 int clienteId = obtenerIdSeleccionado(comboCliente.getSelectedItem().toString());
@@ -201,7 +185,6 @@ public class CitaVista extends JPanel {
                 if (fecha != null && hora != null) {
                     boolean exito = false;
                     if (citaEditandoId != null) {
-                        // Modo edición
                         exito = controlador.editarCita(citaEditandoId, clienteId, servicioId, fecha, hora, observaciones);
                         if (exito) {
                             JOptionPane.showMessageDialog(this, "Cita actualizada exitosamente");
@@ -209,15 +192,17 @@ public class CitaVista extends JPanel {
                             JOptionPane.showMessageDialog(this, "Error: No se pudo actualizar la cita. Verifique disponibilidad.");
                         }
                     } else {
-                        // Modo agregar
-                        exito = controlador.programarCita(clienteId, servicioId, fecha, hora, observaciones);
+                        // ***** CAMBIO A BUILDER AQUÍ *****
+                        exito = controlador.programarCitaConBuilder(clienteId, servicioId, fecha, hora, observaciones);
+                        // **********************************
+
                         if (exito) {
                             JOptionPane.showMessageDialog(this, "Cita programada exitosamente");
                         } else {
                             JOptionPane.showMessageDialog(this, "Error: No se pudo programar la cita. Verifique disponibilidad o datos.");
                         }
                     }
-                    
+
                     if (exito) {
                         limpiarFormulario();
                         actualizarTabla();
@@ -227,13 +212,12 @@ public class CitaVista extends JPanel {
             }
         });
 
-        // Botón Editar
         btnEditar.addActionListener(e -> {
             int filaSeleccionada = tablaCitas.getSelectedRow();
             if (filaSeleccionada != -1) {
                 int citaId = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
                 Cita cita = controlador.buscarCitaPorId(citaId);
-                
+
                 if (cita != null && cita.getEstado().permiteModificacion()) {
                     cargarCitaEnFormulario(cita);
                 } else {
@@ -244,13 +228,12 @@ public class CitaVista extends JPanel {
             }
         });
 
-        // Botón Cambiar Estado
         btnCambiarEstado.addActionListener(e -> {
             int filaSeleccionada = tablaCitas.getSelectedRow();
             if (filaSeleccionada != -1) {
                 int citaId = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
                 Cita cita = controlador.buscarCitaPorId(citaId);
-                
+
                 if (cita != null && cita.getEstado() == EstadoCita.PROGRAMADA) {
                     String[] opciones = {"Completada", "Cancelada"};
                     int opcion = JOptionPane.showOptionDialog(this,
@@ -261,7 +244,7 @@ public class CitaVista extends JPanel {
                             null,
                             opciones,
                             opciones[0]);
-                    
+
                     if (opcion == 0) {
                         controlador.cambiarEstado(citaId, EstadoCita.COMPLETADA);
                         JOptionPane.showMessageDialog(this, "Cita marcada como completada");
@@ -279,34 +262,27 @@ public class CitaVista extends JPanel {
             }
         });
 
-        // Botón Cancelar
         btnCancelar.addActionListener(e -> limpiarFormulario());
     }
 
     private void cargarCitaEnFormulario(Cita cita) {
         citaEditandoId = cita.getId();
-        
-        // Seleccionar cliente
+
         String clienteStr = cita.getCliente().getId() + " - " + cita.getCliente().getNombreCompleto();
         comboCliente.setSelectedItem(clienteStr);
-        
-        // Seleccionar servicio
+
         String servicioStr = cita.getServicio().getId() + " - " + cita.getServicio().getNombre();
         comboServicio.setSelectedItem(servicioStr);
-        
-        // Fecha y hora
+
         txtFecha.setText(cita.getFecha().toString());
         java.util.Date fechaHora = java.sql.Timestamp.valueOf(cita.getFecha().atTime(cita.getHora()));
         spinnerHora.setValue(fechaHora);
-        
-        // Estado (solo lectura)
+
         comboEstado.setSelectedItem(cita.getEstado().name());
         comboEstado.setEnabled(true);
-        
-        // Observaciones
+
         txtObservaciones.setText(cita.getObservaciones());
-        
-        // Cambiar botón
+
         btnAgregar.setText("Guardar Cambios");
         btnEditar.setEnabled(false);
         btnCancelar.setEnabled(true);
@@ -426,4 +402,3 @@ public class CitaVista extends JPanel {
         actualizarAgendaDiaria();
     }
 }
-

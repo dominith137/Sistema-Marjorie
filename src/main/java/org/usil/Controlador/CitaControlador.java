@@ -20,13 +20,11 @@ public class CitaControlador {
     private ClienteControlador clienteControlador;
     private ServicioControlador servicioControlador;
 
-    // Constructor con referencias a otros controladores
     public CitaControlador(ClienteControlador clienteControlador, ServicioControlador servicioControlador) {
         this.clienteControlador = clienteControlador;
         this.servicioControlador = servicioControlador;
     }
 
-    // Programa una nueva cita validando disponibilidad (constructor directo)
     public boolean programarCita(int clienteId, int servicioId, LocalDate fecha, LocalTime hora, String observaciones) {
         Cliente cliente = clienteControlador.buscarClientePorId(clienteId);
         if (cliente == null) return false;
@@ -41,7 +39,6 @@ public class CitaControlador {
         return true;
     }
 
-    // 🚀 NUEVO: Programa una cita usando el patrón Builder
     public boolean programarCitaConBuilder(int clienteId, int servicioId, LocalDate fecha, LocalTime hora, String observaciones) {
         Cliente cliente = clienteControlador.buscarClientePorId(clienteId);
         if (cliente == null) return false;
@@ -51,7 +48,6 @@ public class CitaControlador {
 
         if (!validarDisponibilidad(fecha, hora, servicio.getDuracionMinutos(), null)) return false;
 
-        // Usar el Builder paso a paso
         CitaBuilder builder = new CitaConcreteBuilder();
         builder.setId(contadorId++);
         builder.setCliente(cliente);
@@ -66,7 +62,6 @@ public class CitaControlador {
         return true;
     }
 
-    // Valida si hay disponibilidad en un horario específico
     public boolean validarDisponibilidad(LocalDate fecha, LocalTime hora, int duracionMinutos, Integer citaIdExcluir) {
         LocalTime horaFin = hora.plusMinutes(duracionMinutos);
 
@@ -86,4 +81,71 @@ public class CitaControlador {
         return true;
     }
 
+    public boolean editarCita(Integer citaEditandoId, int clienteId, int servicioId, LocalDate fecha, LocalTime hora, String observaciones) {
+        Cita cita = buscarCitaPorId(citaEditandoId);
+        if (cita == null || !cita.getEstado().permiteModificacion()) return false;
+
+        Cliente cliente = clienteControlador.buscarClientePorId(clienteId);
+        if (cliente == null) return false;
+
+        Servicio servicio = servicioControlador.buscarServicioPorId(servicioId);
+        if (servicio == null || !servicio.isActivo()) return false;
+
+        if (!validarDisponibilidad(fecha, hora, servicio.getDuracionMinutos(), citaEditandoId)) return false;
+
+        cita.setCliente(cliente);
+        cita.setServicio(servicio);
+        cita.setFecha(fecha);
+        cita.setHora(hora);
+        cita.setObservaciones(observaciones);
+        return true;
+    }
+
+    public Cita buscarCitaPorId(int citaId) {
+        return listaCitas.stream()
+                .filter(c -> c.getId() == citaId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void cambiarEstado(int citaId, EstadoCita estadoCita) {
+        Cita cita = buscarCitaPorId(citaId);
+        if (cita != null && cita.getEstado() == EstadoCita.PROGRAMADA) {
+            if (estadoCita == EstadoCita.COMPLETADA) {
+                cita.completar();
+            } else if (estadoCita == EstadoCita.CANCELADA) {
+                cita.cancelar();
+            }
+        }
+    }
+
+    public List<Cita> obtenerTodasLasCitas() {
+        return new ArrayList<>(listaCitas);
+    }
+
+    public List<Cita> obtenerAgendaDiaria(LocalDate fecha) {
+        return listaCitas.stream()
+                .filter(cita -> cita.getFecha().equals(fecha))
+                .sorted((c1, c2) -> c1.getHora().compareTo(c2.getHora()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Cita> obtenerCitasPorRango(LocalDate fechaInicio, LocalDate fechaFin) {
+        return listaCitas.stream()
+                .filter(cita -> !cita.getFecha().isBefore(fechaInicio) && !cita.getFecha().isAfter(fechaFin))
+                .sorted((c1, c2) -> {
+                    int comparacionFecha = c1.getFecha().compareTo(c2.getFecha());
+                    if (comparacionFecha != 0) {
+                        return comparacionFecha;
+                    }
+                    return c1.getHora().compareTo(c2.getHora());
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<Cita> obtenerCitasCompletadasPorRango(LocalDate fechaInicio, LocalDate fechaFin) {
+        return obtenerCitasPorRango(fechaInicio, fechaFin).stream()
+                .filter(cita -> cita.getEstado() == EstadoCita.COMPLETADA)
+                .collect(Collectors.toList());
+    }
 }

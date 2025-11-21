@@ -25,11 +25,11 @@ public class ReporteControlador {
     public Reporte generarReporteCitas(LocalDate fechaInicio, LocalDate fechaFin) {
         Reporte reporte = new Reporte(fechaInicio, fechaFin);
 
-        // Obtener todas las citas en el rango
+        // ✅ Corrección: usar el método correcto del controlador
         List<Cita> citas = citaControlador.obtenerCitasPorRango(fechaInicio, fechaFin);
         reporte.setCitasFiltradas(citas);
 
-        // Calcular estadísticas
+        // Estadísticas
         reporte.setTotalCitas(citas.size());
         reporte.setCitasCompletadas((int) citas.stream()
                 .filter(c -> c.getEstado() == EstadoCita.COMPLETADA)
@@ -38,14 +38,14 @@ public class ReporteControlador {
                 .filter(c -> c.getEstado() == EstadoCita.CANCELADA)
                 .count());
 
-        // Calcular ingresos (solo de citas completadas)
+        // Ingresos
         double ingresos = citas.stream()
                 .filter(c -> c.getEstado() == EstadoCita.COMPLETADA)
                 .mapToDouble(c -> c.getServicio().getPrecio())
                 .sum();
         reporte.setTotalIngresos(ingresos);
 
-        // Contar servicios más solicitados
+        // Servicios más solicitados
         Map<String, Integer> serviciosContador = new HashMap<>();
         citas.forEach(cita -> {
             String nombreServicio = cita.getServicio().getNombre();
@@ -61,11 +61,9 @@ public class ReporteControlador {
     public Reporte generarReporteIngresos(LocalDate fechaInicio, LocalDate fechaFin) {
         Reporte reporte = new Reporte(fechaInicio, fechaFin);
 
-        // Obtener solo citas completadas
         List<Cita> citasCompletadas = citaControlador.obtenerCitasCompletadasPorRango(fechaInicio, fechaFin);
         reporte.setCitasFiltradas(citasCompletadas);
 
-        // Calcular ingresos
         double ingresos = citasCompletadas.stream()
                 .mapToDouble(c -> c.getServicio().getPrecio())
                 .sum();
@@ -87,7 +85,6 @@ public class ReporteControlador {
                     serviciosContador.getOrDefault(nombreServicio, 0) + 1);
         });
 
-        // Ordenar por cantidad (descendente) y limitar a top 10
         return serviciosContador.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
                 .limit(10)
@@ -125,9 +122,7 @@ public class ReporteControlador {
         return generarReporteCitas(fechaInicio, fechaFin);
     }
 
-    // ==========================
-    // NUEVO: Exportar en PDF usando Factory
-    // ==========================
+    // Exportar en PDF usando Factory
     public void exportarPDF(Reporte reporte) {
         ReporteFormato formato = (ReporteFormato) ReporteFactory.crearReporte("pdf");
         formato.generar(reporte);
