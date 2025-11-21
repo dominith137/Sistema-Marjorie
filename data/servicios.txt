@@ -1,1 +1,2 @@
 1;peinado;lashes;20.0;30;true
+2;Balayage;color caramelo;200.0;180;true
