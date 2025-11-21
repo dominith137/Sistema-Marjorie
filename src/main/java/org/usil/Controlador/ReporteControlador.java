@@ -25,7 +25,7 @@ public class ReporteControlador {
     public Reporte generarReporteCitas(LocalDate fechaInicio, LocalDate fechaFin) {
         Reporte reporte = new Reporte(fechaInicio, fechaFin);
 
-        // ✅ Corrección: usar el método correcto del controlador
+        //  usar el método correcto del controlador
         List<Cita> citas = citaControlador.obtenerCitasPorRango(fechaInicio, fechaFin);
         reporte.setCitasFiltradas(citas);
 

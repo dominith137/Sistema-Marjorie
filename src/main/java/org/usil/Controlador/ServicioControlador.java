@@ -95,4 +95,6 @@ public class ServicioControlador {
                 .toList();
     }
 
+    public void agregarServicio(String nombre, double precio, int duracionMinutos) {
+    }
 }
