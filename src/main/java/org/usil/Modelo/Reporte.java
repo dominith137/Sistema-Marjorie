@@ -27,6 +27,9 @@ public class Reporte {
         this.citasCanceladas = 0;
     }
 
+    public Reporte() {
+    }
+
     // Getters
     public LocalDate getFechaInicio() {
         return fechaInicio;

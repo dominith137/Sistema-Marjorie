@@ -1,6 +1,6 @@
 package org.usil.Modelo;
 
-public class ReportePDF implements ReporteFormato {
+public class ReportePDF extends Reporte implements ReporteFormato {
     @Override
     public void generar(Reporte reporte) {
         System.out.println("=== GENERANDO PDF ===");

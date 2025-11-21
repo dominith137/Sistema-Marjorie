@@ -24,6 +24,7 @@ public class ReporteVista extends JPanel {
     private JTextArea txtResumen;
     private JButton btnGenerar;
     private JButton btnExportar;
+    private JButton btnExportarPDF;
 
     public ReporteVista(ReporteControlador controlador) {
         this.controlador = controlador;
@@ -52,7 +53,8 @@ public class ReporteVista extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
 
         // Fecha inicio
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         form.add(new JLabel("Fecha Inicio (YYYY-MM-DD):"), gbc);
         gbc.gridx = 1;
         txtFechaInicio = new JTextField(12);
@@ -60,7 +62,8 @@ public class ReporteVista extends JPanel {
         form.add(txtFechaInicio, gbc);
 
         // Fecha fin
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         form.add(new JLabel("Fecha Fin (YYYY-MM-DD):"), gbc);
         gbc.gridx = 1;
         txtFechaFin = new JTextField(12);
@@ -68,14 +71,15 @@ public class ReporteVista extends JPanel {
         form.add(txtFechaFin, gbc);
 
         // Tipo de reporte
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         form.add(new JLabel("Tipo de Reporte:"), gbc);
         gbc.gridx = 1;
         comboTipoReporte = new JComboBox<>(new String[]{
-            "Reporte Completo",
-            "Reporte de Citas",
-            "Reporte de Ingresos",
-            "Servicios Más Solicitados"
+                "Reporte Completo",
+                "Reporte de Citas",
+                "Reporte de Ingresos",
+                "Servicios Más Solicitados"
         });
         form.add(comboTipoReporte, gbc);
 
@@ -83,9 +87,12 @@ public class ReporteVista extends JPanel {
         JPanel botonesPanel = new JPanel(new FlowLayout());
         btnGenerar = new JButton("Generar Reporte");
         btnExportar = new JButton("Exportar CSV");
+        btnExportarPDF = new JButton("Exportar PDF");
         btnExportar.setEnabled(false);
         botonesPanel.add(btnGenerar);
         botonesPanel.add(btnExportar);
+        btnExportarPDF.setEnabled(false); // solo se activa si hay reporte
+        botonesPanel.add(btnExportarPDF);
 
         panel.add(form, BorderLayout.CENTER);
         panel.add(botonesPanel, BorderLayout.SOUTH);
@@ -113,7 +120,7 @@ public class ReporteVista extends JPanel {
         panelTabla.setBorder(BorderFactory.createTitledBorder("Detalle de Citas"));
 
         modeloTabla = new DefaultTableModel(new Object[]{
-            "ID", "Fecha", "Hora", "Cliente", "Servicio", "Precio", "Estado"
+                "ID", "Fecha", "Hora", "Cliente", "Servicio", "Precio", "Estado"
         }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -182,29 +189,29 @@ public class ReporteVista extends JPanel {
         List<Cita> citas = reporte.getCitasFiltradas();
         for (Cita c : citas) {
             modeloTabla.addRow(new Object[]{
-                c.getId(),
-                c.getFecha().toString(),
-                c.getHora().toString(),
-                c.getNombreCliente(),
-                c.getNombreServicio(),
-                String.format("S/ %.2f", c.getServicio().getPrecio()),
-                c.getEstado().getNombreEspanol()
+                    c.getId(),
+                    c.getFecha().toString(),
+                    c.getHora().toString(),
+                    c.getNombreCliente(),
+                    c.getNombreServicio(),
+                    String.format("S/ %.2f", c.getServicio().getPrecio()),
+                    c.getEstado().getNombreEspanol()
             });
         }
     }
 
     private void mostrarServiciosMasSolicitados(LocalDate fechaInicio, LocalDate fechaFin) {
         Map<String, Integer> servicios = controlador.obtenerServiciosMasSolicitados(fechaInicio, fechaFin);
-        
+
         // Actualizar resumen
         StringBuilder resumen = new StringBuilder();
         resumen.append("=== SERVICIOS MÁS SOLICITADOS ===\n");
         resumen.append("Período: ").append(fechaInicio).append(" a ").append(fechaFin).append("\n\n");
-        
+
         int posicion = 1;
         for (Map.Entry<String, Integer> entry : servicios.entrySet()) {
             resumen.append(posicion).append(". ").append(entry.getKey())
-                .append(": ").append(entry.getValue()).append(" veces\n");
+                    .append(": ").append(entry.getValue()).append(" veces\n");
             posicion++;
         }
         txtResumen.setText(resumen.toString());
@@ -265,4 +272,3 @@ public class ReporteVista extends JPanel {
         // Actualizar si hay datos cargados
     }
 }
-
