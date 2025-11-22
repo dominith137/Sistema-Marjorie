@@ -24,9 +24,9 @@ public class GestorDatos {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivo, false))) {
             for (Cliente cliente : controlador.obtenerClientes()) {
                 String linea = cliente.getId() + DELIMITADOR +
-                              cliente.getNombreCompleto() + DELIMITADOR +
-                              cliente.getTelefono() + DELIMITADOR +
-                              cliente.getFechaRegistro().toString();
+                        cliente.getNombreCompleto() + DELIMITADOR +
+                        cliente.getTelefono() + DELIMITADOR +
+                        cliente.getFechaRegistro().toString();
                 writer.write(linea);
                 writer.newLine();
             }
@@ -41,7 +41,7 @@ public class GestorDatos {
     public boolean cargarClientes(ClienteControlador controlador) {
         File archivo = new File(DIRECTORIO_DATOS, ARCHIVO_CLIENTES);
         if (!archivo.exists()) {
-            return true; // No hay archivo, no es error
+            return true;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(archivo))) {
@@ -75,11 +75,11 @@ public class GestorDatos {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivo, false))) {
             for (Servicio servicio : controlador.obtenerTodosLosServicios()) {
                 String linea = servicio.getId() + DELIMITADOR +
-                              servicio.getNombre() + DELIMITADOR +
-                              servicio.getDescripcion() + DELIMITADOR +
-                              servicio.getPrecio() + DELIMITADOR +
-                              servicio.getDuracionMinutos() + DELIMITADOR +
-                              servicio.isActivo();
+                        servicio.getNombre() + DELIMITADOR +
+                        servicio.getDescripcion() + DELIMITADOR +
+                        servicio.getPrecio() + DELIMITADOR +
+                        servicio.getDuracionMinutos() + DELIMITADOR +
+                        servicio.isActivo();
                 writer.write(linea);
                 writer.newLine();
             }
@@ -113,7 +113,7 @@ public class GestorDatos {
 
                         controlador.agregarServicio(nombre, descripcion, precio, duracion);
                         if (!activo) {
-                            // Necesitaríamos el ID para desactivar, pero por simplicidad lo dejamos activo
+
                         }
                     } catch (Exception e) {
                         System.err.println("Error al cargar servicio: " + linea);
@@ -128,19 +128,21 @@ public class GestorDatos {
     }
 
     // Guarda todas las citas en archivo
-    public boolean guardarCitas(CitaControlador controlador, ClienteControlador clienteControlador, ServicioControlador servicioControlador) {
+    public boolean guardarCitas(CitaControlador controlador,
+                                ClienteControlador clienteControlador,
+                                ServicioControlador servicioControlador) {
         crearDirectorioSiNoExiste();
         File archivo = new File(DIRECTORIO_DATOS, ARCHIVO_CITAS);
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivo, false))) {
             for (Cita cita : controlador.obtenerTodasLasCitas()) {
                 String linea = cita.getId() + DELIMITADOR +
-                              cita.getCliente().getId() + DELIMITADOR +
-                              cita.getServicio().getId() + DELIMITADOR +
-                              cita.getFecha().toString() + DELIMITADOR +
-                              cita.getHora().toString() + DELIMITADOR +
-                              cita.getEstado().name() + DELIMITADOR +
-                              (cita.getObservaciones() != null ? cita.getObservaciones().replace("\n", " ") : "");
+                        cita.getCliente().getId() + DELIMITADOR +
+                        cita.getServicio().getId() + DELIMITADOR +
+                        cita.getFecha().toString() + DELIMITADOR +
+                        cita.getHora().toString() + DELIMITADOR +
+                        (cita.getEstado() != null ? cita.getEstado().getNombreEspanol() : "Programada") + DELIMITADOR +
+                        (cita.getObservaciones() != null ? cita.getObservaciones().replace("\n", " ") : "");
                 writer.write(linea);
                 writer.newLine();
             }
@@ -152,7 +154,9 @@ public class GestorDatos {
     }
 
     // Carga todas las citas desde archivo
-    public boolean cargarCitas(CitaControlador controlador, ClienteControlador clienteControlador, ServicioControlador servicioControlador) {
+    public boolean cargarCitas(CitaControlador controlador,
+                               ClienteControlador clienteControlador,
+                               ServicioControlador servicioControlador) {
         File archivo = new File(DIRECTORIO_DATOS, ARCHIVO_CITAS);
         if (!archivo.exists()) {
             return true;
@@ -170,7 +174,7 @@ public class GestorDatos {
                         int servicioId = Integer.parseInt(partes[2].trim());
                         LocalDate fecha = LocalDate.parse(partes[3].trim());
                         LocalTime hora = LocalTime.parse(partes[4].trim());
-                        EstadoCita estado = EstadoCita.valueOf(partes[5].trim());
+                        EstadoCita estado = crearEstadoDesdeTexto(partes[5].trim());
                         String observaciones = partes.length > 6 ? partes[6].trim() : "";
 
                         Cliente cliente = clienteControlador.buscarClientePorId(clienteId);
@@ -178,8 +182,8 @@ public class GestorDatos {
 
                         if (cliente != null && servicio != null) {
                             controlador.programarCita(clienteId, servicioId, fecha, hora, observaciones);
-                            // Cambiar estado si no es PROGRAMADA
-                            if (estado != EstadoCita.PROGRAMADA) {
+
+                            if (!(estado instanceof EstadoCitaProgramada)) {
                                 Cita cita = controlador.buscarCitaPorId(controlador.obtenerTodasLasCitas().size());
                                 if (cita != null) {
                                     controlador.cambiarEstado(cita.getId(), estado);
@@ -199,9 +203,9 @@ public class GestorDatos {
     }
 
     // Guarda todos los datos del sistema
-    public boolean guardarTodo(ClienteControlador clienteControlador, 
-                              ServicioControlador servicioControlador,
-                              CitaControlador citaControlador) {
+    public boolean guardarTodo(ClienteControlador clienteControlador,
+                               ServicioControlador servicioControlador,
+                               CitaControlador citaControlador) {
         boolean exito = true;
         exito &= guardarClientes(clienteControlador);
         exito &= guardarServicios(servicioControlador);
@@ -211,8 +215,8 @@ public class GestorDatos {
 
     // Carga todos los datos del sistema
     public boolean cargarTodo(ClienteControlador clienteControlador,
-                             ServicioControlador servicioControlador,
-                             CitaControlador citaControlador) {
+                              ServicioControlador servicioControlador,
+                              CitaControlador citaControlador) {
         boolean exito = true;
         exito &= cargarClientes(clienteControlador);
         exito &= cargarServicios(servicioControlador);
@@ -227,5 +231,20 @@ public class GestorDatos {
             directorio.mkdirs();
         }
     }
-}
 
+    // Traduce el texto del archivo al estado concreto (State)
+    private EstadoCita crearEstadoDesdeTexto(String texto) {
+        if (texto == null) return new EstadoCitaProgramada();
+
+        String valor = texto.trim().toUpperCase();
+        switch (valor) {
+            case "COMPLETADA":
+                return new EstadoCitaCompletada();
+            case "CANCELADA":
+                return new EstadoCitaCancelada();
+            case "PROGRAMADA":
+            default:
+                return new EstadoCitaProgramada();
+        }
+    }
+}

@@ -5,6 +5,8 @@ import org.usil.Modelo.EstadoCita;
 import org.usil.Modelo.GestorDatos;
 import org.usil.Modelo.Reporte;
 import org.usil.Modelo.ReporteFormato;
+import org.usil.Modelo.EstadoCitaCompletada;
+import org.usil.Modelo.EstadoCitaCancelada;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -32,15 +34,14 @@ public class ReporteControlador {
         // Estadísticas
         reporte.setTotalCitas(citas.size());
         reporte.setCitasCompletadas((int) citas.stream()
-                .filter(c -> c.getEstado() == EstadoCita.COMPLETADA)
+                .filter(c -> c.getEstado() instanceof EstadoCitaCompletada)
                 .count());
         reporte.setCitasCanceladas((int) citas.stream()
-                .filter(c -> c.getEstado() == EstadoCita.CANCELADA)
+                .filter(c -> c.getEstado() instanceof EstadoCitaCancelada)
                 .count());
 
-        // Ingresos
         double ingresos = citas.stream()
-                .filter(c -> c.getEstado() == EstadoCita.COMPLETADA)
+                .filter(c -> c.getEstado() instanceof EstadoCitaCompletada)
                 .mapToDouble(c -> c.getServicio().getPrecio())
                 .sum();
         reporte.setTotalIngresos(ingresos);
@@ -109,8 +110,9 @@ public class ReporteControlador {
         List<Cita> citas = citaControlador.obtenerCitasPorRango(fechaInicio, fechaFin);
 
         if (estado != null) {
+            Class<?> tipoEstado = estado.getClass();
             return citas.stream()
-                    .filter(c -> c.getEstado() == estado)
+                    .filter(c -> c.getEstado() != null && c.getEstado().getClass().equals(tipoEstado))
                     .collect(Collectors.toList());
         }
 

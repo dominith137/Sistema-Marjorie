@@ -3,7 +3,6 @@ package org.usil.Modelo;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-// Modelo que representa una cita en el sistema
 public class Cita {
     private int id;
     private Cliente cliente;
@@ -13,20 +12,29 @@ public class Cita {
     private EstadoCita estado;
     private String observaciones;
 
-    // Constructor completo
-    public Cita(int id, Cliente cliente, Servicio servicio, LocalDate fecha, LocalTime hora, EstadoCita estado, String observaciones) {
+    public Cita() {
+        this.id = 0;
+        this.cliente = null;
+        this.servicio = null;
+        this.fecha = null;
+        this.hora = null;
+        this.estado = new EstadoCitaProgramada();
+        this.observaciones = "";
+    }
+
+    public Cita(int id, Cliente cliente, Servicio servicio, LocalDate fecha, LocalTime hora, String observaciones) {
         this.id = id;
         this.cliente = cliente;
         this.servicio = servicio;
         this.fecha = fecha;
         this.hora = hora;
-        this.estado = estado;
+        this.estado = new EstadoCitaProgramada();
         this.observaciones = observaciones != null ? observaciones : "";
     }
 
     // Constructor sin observaciones
-    public Cita(int id, Cliente cliente, Servicio servicio, LocalDate fecha, LocalTime hora, EstadoCita estado) {
-        this(id, cliente, servicio, fecha, hora, estado, "");
+    public Cita(int id, Cliente cliente, Servicio servicio, LocalDate fecha, LocalTime hora) {
+        this(id, cliente, servicio, fecha, hora, "");
     }
 
     // Getters
@@ -59,6 +67,10 @@ public class Cita {
     }
 
     // Setters
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
@@ -83,27 +95,26 @@ public class Cita {
         this.observaciones = observaciones != null ? observaciones : "";
     }
 
-    // Cambia el estado a completada
     public void completar() {
-        this.estado = EstadoCita.COMPLETADA;
+        if (estado != null) {
+            estado.completar(this);
+        }
     }
 
-    // Cambia el estado a cancelada
     public void cancelar() {
-        this.estado = EstadoCita.CANCELADA;
+        if (estado != null) {
+            estado.cancelar(this);
+        }
     }
 
-    // Verifica si la cita está programada
     public boolean estaProgramada() {
-        return this.estado == EstadoCita.PROGRAMADA;
+        return estado instanceof EstadoCitaProgramada;
     }
 
-    // Obtiene el nombre completo del cliente
     public String getNombreCliente() {
         return cliente != null ? cliente.getNombreCompleto() : "N/A";
     }
 
-    // Obtiene el nombre del servicio
     public String getNombreServicio() {
         return servicio != null ? servicio.getNombre() : "N/A";
     }
@@ -116,9 +127,8 @@ public class Cita {
                 ", servicio=" + getNombreServicio() +
                 ", fecha=" + fecha +
                 ", hora=" + hora +
-                ", estado=" + estado.getNombreEspanol() +
+                ", estado=" + (estado != null ? estado.getNombreEspanol() : "N/A") +
                 ", observaciones='" + observaciones + '\'' +
                 '}';
     }
 }
-
