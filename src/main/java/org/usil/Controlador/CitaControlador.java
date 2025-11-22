@@ -6,6 +6,9 @@ import org.usil.Modelo.EstadoCita;
 import org.usil.Modelo.Servicio;
 import org.usil.Modelo.CitaBuilder;
 import org.usil.Modelo.CitaConcreteBuilder;
+import org.usil.Modelo.EstadoCitaProgramada;
+import org.usil.Modelo.EstadoCitaCompletada;
+import org.usil.Modelo.EstadoCitaCancelada;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -34,7 +37,7 @@ public class CitaControlador {
 
         if (!validarDisponibilidad(fecha, hora, servicio.getDuracionMinutos(), null)) return false;
 
-        Cita nuevaCita = new Cita(contadorId++, cliente, servicio, fecha, hora, EstadoCita.PROGRAMADA, observaciones);
+        Cita nuevaCita = new Cita(contadorId++, cliente, servicio, fecha, hora, observaciones);
         listaCitas.add(nuevaCita);
         return true;
     }
@@ -54,7 +57,7 @@ public class CitaControlador {
         builder.setServicio(servicio);
         builder.setFecha(fecha);
         builder.setHora(hora);
-        builder.setEstado(EstadoCita.PROGRAMADA);
+        builder.setEstado(new EstadoCitaProgramada());
         builder.setObservaciones(observaciones);
 
         Cita nuevaCita = builder.build();
@@ -68,7 +71,7 @@ public class CitaControlador {
         for (Cita cita : listaCitas) {
             if (citaIdExcluir != null && cita.getId() == citaIdExcluir) continue;
 
-            if (cita.getFecha().equals(fecha) && cita.getEstado() == EstadoCita.PROGRAMADA) {
+            if (cita.getFecha().equals(fecha) && cita.getEstado() != null && cita.getEstado().permiteModificacion()) {
                 LocalTime citaHoraInicio = cita.getHora();
                 int citaDuracion = cita.getServicio().getDuracionMinutos();
                 LocalTime citaHoraFin = citaHoraInicio.plusMinutes(citaDuracion);
@@ -83,7 +86,7 @@ public class CitaControlador {
 
     public boolean editarCita(Integer citaEditandoId, int clienteId, int servicioId, LocalDate fecha, LocalTime hora, String observaciones) {
         Cita cita = buscarCitaPorId(citaEditandoId);
-        if (cita == null || !cita.getEstado().permiteModificacion()) return false;
+        if (cita == null || cita.getEstado() == null || !cita.getEstado().permiteModificacion()) return false;
 
         Cliente cliente = clienteControlador.buscarClientePorId(clienteId);
         if (cliente == null) return false;
@@ -108,12 +111,13 @@ public class CitaControlador {
                 .orElse(null);
     }
 
-    public void cambiarEstado(int citaId, EstadoCita estadoCita) {
+    public void cambiarEstado(int citaId, EstadoCita nuevoEstado) {
         Cita cita = buscarCitaPorId(citaId);
-        if (cita != null && cita.getEstado() == EstadoCita.PROGRAMADA) {
-            if (estadoCita == EstadoCita.COMPLETADA) {
+
+        if (cita != null && cita.getEstado() != null && cita.getEstado().permiteModificacion() && nuevoEstado != null) {
+            if (nuevoEstado instanceof EstadoCitaCompletada) {
                 cita.completar();
-            } else if (estadoCita == EstadoCita.CANCELADA) {
+            } else if (nuevoEstado instanceof EstadoCitaCancelada) {
                 cita.cancelar();
             }
         }
@@ -145,7 +149,7 @@ public class CitaControlador {
 
     public List<Cita> obtenerCitasCompletadasPorRango(LocalDate fechaInicio, LocalDate fechaFin) {
         return obtenerCitasPorRango(fechaInicio, fechaFin).stream()
-                .filter(cita -> cita.getEstado() == EstadoCita.COMPLETADA)
+                .filter(cita -> cita.getEstado() instanceof EstadoCitaCompletada)
                 .collect(Collectors.toList());
     }
 }
