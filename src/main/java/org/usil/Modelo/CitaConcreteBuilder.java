@@ -3,21 +3,17 @@ package org.usil.Modelo;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-// Implementación concreta del Builder para construir una Cita
 public class CitaConcreteBuilder implements CitaBuilder {
     private Cita cita;
 
-    // Inicializa una cita vacía con valores por defecto
+
     public CitaConcreteBuilder() {
-        this.cita = new Cita(0, null, null, null, null, EstadoCita.PROGRAMADA, "");
+        this.cita = new  Cita();
     }
 
     @Override
     public void setId(int id) {
-        cita.setCliente(cita.getCliente()); // mantiene cliente actual
-        cita = new Cita(id, cita.getCliente(), cita.getServicio(),
-                cita.getFecha(), cita.getHora(),
-                cita.getEstado(), cita.getObservaciones());
+        cita.setId(id);
     }
 
     @Override

@@ -5,8 +5,11 @@ import org.usil.Controlador.ClienteControlador;
 import org.usil.Controlador.ServicioControlador;
 import org.usil.Modelo.Cita;
 import org.usil.Modelo.Cliente;
-import org.usil.Modelo.EstadoCita;
 import org.usil.Modelo.Servicio;
+import org.usil.Modelo.EstadoCita;
+import org.usil.Modelo.EstadoCitaProgramada;
+import org.usil.Modelo.EstadoCitaCompletada;
+import org.usil.Modelo.EstadoCitaCancelada;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -103,8 +106,8 @@ public class CitaVista extends JPanel {
         form.add(new JLabel("Hora (HH:MM):"), gbc);
         gbc.gridx = 1;
         SpinnerDateModel horaModel = new SpinnerDateModel();
-        JSpinner.DateEditor horaEditor = new JSpinner.DateEditor(new JSpinner(horaModel), "HH:mm");
         spinnerHora = new JSpinner(horaModel);
+        JSpinner.DateEditor horaEditor = new JSpinner.DateEditor(spinnerHora, "HH:mm");
         spinnerHora.setEditor(horaEditor);
         spinnerHora.setValue(new java.util.Date());
         spinnerHora.setPreferredSize(new Dimension(100, 25));
@@ -113,7 +116,8 @@ public class CitaVista extends JPanel {
         gbc.gridx = 0; gbc.gridy = 4;
         form.add(new JLabel("Estado:"), gbc);
         gbc.gridx = 1;
-        comboEstado = new JComboBox<>(new String[]{"PROGRAMADA", "COMPLETADA", "CANCELADA"});
+        // Solo se muestra, no se usa para lógica
+        comboEstado = new JComboBox<>(new String[]{"Programada", "Completada", "Cancelada"});
         comboEstado.setEnabled(false);
         form.add(comboEstado, gbc);
 
@@ -192,9 +196,7 @@ public class CitaVista extends JPanel {
                             JOptionPane.showMessageDialog(this, "Error: No se pudo actualizar la cita. Verifique disponibilidad.");
                         }
                     } else {
-                        // ***** CAMBIO A BUILDER AQUÍ *****
                         exito = controlador.programarCitaConBuilder(clienteId, servicioId, fecha, hora, observaciones);
-                        // **********************************
 
                         if (exito) {
                             JOptionPane.showMessageDialog(this, "Cita programada exitosamente");
@@ -218,7 +220,7 @@ public class CitaVista extends JPanel {
                 int citaId = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
                 Cita cita = controlador.buscarCitaPorId(citaId);
 
-                if (cita != null && cita.getEstado().permiteModificacion()) {
+                if (cita != null && cita.getEstado() != null && cita.getEstado().permiteModificacion()) {
                     cargarCitaEnFormulario(cita);
                 } else {
                     JOptionPane.showMessageDialog(this, "Solo se pueden editar citas programadas");
@@ -234,7 +236,7 @@ public class CitaVista extends JPanel {
                 int citaId = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
                 Cita cita = controlador.buscarCitaPorId(citaId);
 
-                if (cita != null && cita.getEstado() == EstadoCita.PROGRAMADA) {
+                if (cita != null && cita.getEstado() != null && cita.getEstado().permiteModificacion()) {
                     String[] opciones = {"Completada", "Cancelada"};
                     int opcion = JOptionPane.showOptionDialog(this,
                             "Seleccione el nuevo estado:",
@@ -246,10 +248,10 @@ public class CitaVista extends JPanel {
                             opciones[0]);
 
                     if (opcion == 0) {
-                        controlador.cambiarEstado(citaId, EstadoCita.COMPLETADA);
+                        controlador.cambiarEstado(citaId, new EstadoCitaCompletada());
                         JOptionPane.showMessageDialog(this, "Cita marcada como completada");
                     } else if (opcion == 1) {
-                        controlador.cambiarEstado(citaId, EstadoCita.CANCELADA);
+                        controlador.cambiarEstado(citaId, new EstadoCitaCancelada());
                         JOptionPane.showMessageDialog(this, "Cita cancelada");
                     }
                     actualizarTabla();
@@ -278,7 +280,11 @@ public class CitaVista extends JPanel {
         java.util.Date fechaHora = java.sql.Timestamp.valueOf(cita.getFecha().atTime(cita.getHora()));
         spinnerHora.setValue(fechaHora);
 
-        comboEstado.setSelectedItem(cita.getEstado().name());
+        if (cita.getEstado() != null) {
+            comboEstado.setSelectedItem(cita.getEstado().getNombreEspanol());
+        } else {
+            comboEstado.setSelectedIndex(0);
+        }
         comboEstado.setEnabled(true);
 
         txtObservaciones.setText(cita.getObservaciones());
@@ -357,7 +363,7 @@ public class CitaVista extends JPanel {
                     c.getHora().toString(),
                     c.getNombreCliente(),
                     c.getNombreServicio(),
-                    c.getEstado().getNombreEspanol(),
+                    c.getEstado() != null ? c.getEstado().getNombreEspanol() : "N/A",
                     c.getObservaciones()
             });
         }
@@ -374,7 +380,7 @@ public class CitaVista extends JPanel {
                         c.getHora().toString(),
                         c.getNombreCliente(),
                         c.getNombreServicio(),
-                        c.getEstado().getNombreEspanol(),
+                        c.getEstado() != null ? c.getEstado().getNombreEspanol() : "N/A",
                         c.getObservaciones()
                 });
             }
