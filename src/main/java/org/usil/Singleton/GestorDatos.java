@@ -1,4 +1,4 @@
-package org.usil.Controlador;
+package org.usil.Singleton;
 
 public class GestorDatos {
     // 1. Instancia única (estática)
@@ -26,3 +26,4 @@ public class GestorDatos {
         System.out.println("Eliminando: " + objeto);
     }
 }
+

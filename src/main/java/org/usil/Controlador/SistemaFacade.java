@@ -2,6 +2,7 @@ package org.usil.Controlador;
 
 import org.usil.Modelo.Cita;
 import org.usil.Modelo.EstadoCita;
+import org.usil.Singleton.GestorDatos;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
