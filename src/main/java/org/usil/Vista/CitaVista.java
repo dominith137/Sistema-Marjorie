@@ -3,6 +3,7 @@ package org.usil.Vista;
 import org.usil.Controlador.CitaControlador;
 import org.usil.Controlador.ClienteControlador;
 import org.usil.Controlador.ServicioControlador;
+import org.usil.Controlador.MenuPrincipalControlador;
 import org.usil.Modelo.Cita;
 import org.usil.Modelo.Cliente;
 import org.usil.Modelo.Servicio;
@@ -23,6 +24,7 @@ public class CitaVista extends JPanel {
     private CitaControlador controlador;
     private ClienteControlador clienteControlador;
     private ServicioControlador servicioControlador;
+    private MenuPrincipalControlador menuControlador;
 
     private JComboBox<String> comboCliente;
     private JComboBox<String> comboServicio;
@@ -43,10 +45,11 @@ public class CitaVista extends JPanel {
     private DefaultComboBoxModel<String> modeloClientes;
     private DefaultComboBoxModel<String> modeloServicios;
 
-    public CitaVista(CitaControlador controlador, ClienteControlador clienteControlador, ServicioControlador servicioControlador) {
+    public CitaVista(CitaControlador controlador, ClienteControlador clienteControlador, ServicioControlador servicioControlador, MenuPrincipalControlador menuControlador) {
         this.controlador = controlador;
         this.clienteControlador = clienteControlador;
         this.servicioControlador = servicioControlador;
+        this.menuControlador = menuControlador;
         initComponents();
     }
 
@@ -204,6 +207,7 @@ public class CitaVista extends JPanel {
                     }
 
                     if (exito) {
+                        menuControlador.guardarDatos(); // Guardar automáticamente
                         limpiarFormulario();
                         actualizarTabla();
                         actualizarAgendaDiaria();
@@ -247,9 +251,11 @@ public class CitaVista extends JPanel {
 
                     if (opcion == 0) {
                         controlador.cambiarEstado(citaId, new EstadoCitaCompletada());
+                        menuControlador.guardarDatos(); // Guardar automáticamente
                         JOptionPane.showMessageDialog(this, "Cita marcada como completada");
                     } else if (opcion == 1) {
                         controlador.cambiarEstado(citaId, new EstadoCitaCancelada());
+                        menuControlador.guardarDatos(); // Guardar automáticamente
                         JOptionPane.showMessageDialog(this, "Cita cancelada");
                     }
                     actualizarTabla();
