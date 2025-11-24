@@ -56,9 +56,17 @@ public class GestorDatos {
                 String[] partes = linea.split(DELIMITADOR);
                 if (partes.length >= 3) {
                     try {
+                        int id = Integer.parseInt(partes[0].trim());
                         String nombre = partes[1].trim();
                         String telefono = partes[2].trim();
-                        controlador.agregarCliente(nombre, telefono);
+                        // Si hay fecha guardada, usarla; si no, usar fecha actual
+                        LocalDate fechaRegistro;
+                        if (partes.length >= 4 && !partes[3].trim().isEmpty()) {
+                            fechaRegistro = LocalDate.parse(partes[3].trim());
+                        } else {
+                            fechaRegistro = LocalDate.now();
+                        }
+                        controlador.agregarClienteConFecha(id, nombre, telefono, fechaRegistro);
                     } catch (Exception e) {
                         System.err.println("Error al cargar cliente: " + linea);
                     }
