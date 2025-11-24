@@ -1,8 +1,8 @@
 package org.usil.Controlador;
 
-import org.usil.Modelo.ReporteFormato;
-import org.usil.Modelo.ReportePDF;
-import org.usil.Modelo.ReporteConsola;
+import org.usil.Strategy.ReporteFormato;
+import org.usil.Strategy.ReportePDF;
+import org.usil.Strategy.ReporteConsola;
 
 public class ReporteFactory {
 

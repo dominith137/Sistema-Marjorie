@@ -1,5 +1,6 @@
-package org.usil.Modelo;
+package org.usil.Strategy;
 
+import org.usil.Modelo.Reporte;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -47,3 +48,4 @@ public class ReportePDF implements ReporteFormato {
         }
     }
 }
+

@@ -2,9 +2,8 @@ package org.usil.Controlador;
 
 import org.usil.Modelo.Cita;
 import org.usil.State.EstadoCita;
-import org.usil.Modelo.GestorDatos;
 import org.usil.Modelo.Reporte;
-import org.usil.Modelo.ReporteFormato;
+import org.usil.Strategy.ReporteFormato;
 import org.usil.State.EstadoCitaCompletada;
 import org.usil.State.EstadoCitaCancelada;
 

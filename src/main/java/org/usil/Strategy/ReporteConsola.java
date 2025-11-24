@@ -1,4 +1,6 @@
-package org.usil.Modelo;
+package org.usil.Strategy;
+
+import org.usil.Modelo.Reporte;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,3 +13,4 @@ public class ReporteConsola implements ReporteFormato {
         System.out.println(reporte.obtenerResumen());
     }
 }
+
