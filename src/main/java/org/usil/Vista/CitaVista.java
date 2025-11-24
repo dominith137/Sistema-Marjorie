@@ -4,6 +4,7 @@ import org.usil.Controlador.CitaControlador;
 import org.usil.Controlador.ClienteControlador;
 import org.usil.Controlador.ServicioControlador;
 import org.usil.Controlador.MenuPrincipalControlador;
+import org.usil.Controlador.ResultadoOperacion;
 import org.usil.Modelo.Cita;
 import org.usil.Modelo.Cliente;
 import org.usil.Modelo.Servicio;
@@ -14,9 +15,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 
 // Vista para gestionar las citas del sistema
@@ -180,39 +178,24 @@ public class CitaVista extends JPanel {
 
     private void configurarAccionesBotones() {
         btnAgregar.addActionListener(e -> {
-            if (validarFormulario()) {
-                int clienteId = obtenerIdSeleccionado(comboCliente.getSelectedItem().toString());
-                int servicioId = obtenerIdSeleccionado(comboServicio.getSelectedItem().toString());
-                LocalDate fecha = parsearFecha(txtFecha.getText());
-                LocalTime hora = parsearHora(spinnerHora);
-                String observaciones = txtObservaciones.getText();
+            String clienteStr = comboCliente.getSelectedItem() != null ? comboCliente.getSelectedItem().toString() : "";
+            String servicioStr = comboServicio.getSelectedItem() != null ? comboServicio.getSelectedItem().toString() : "";
+            String fechaStr = txtFecha.getText();
+            java.util.Date horaDate = (java.util.Date) spinnerHora.getValue();
+            String observaciones = txtObservaciones.getText();
 
-                if (fecha != null && hora != null) {
-                    boolean exito = false;
-                    if (citaEditandoId != null) {
-                        exito = controlador.editarCita(citaEditandoId, clienteId, servicioId, fecha, hora, observaciones);
-                        if (exito) {
-                            JOptionPane.showMessageDialog(this, "Cita actualizada exitosamente");
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Error: No se pudo actualizar la cita. Verifique disponibilidad.");
-                        }
-                    } else {
-                        exito = controlador.programarCitaConBuilder(clienteId, servicioId, fecha, hora, observaciones);
+            ResultadoOperacion resultado = controlador.validarYProcesarCita(
+                citaEditandoId, clienteStr, servicioStr, fechaStr, horaDate, observaciones
+            );
 
-                        if (exito) {
-                            JOptionPane.showMessageDialog(this, "Cita programada exitosamente");
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Error: No se pudo programar la cita. Verifique disponibilidad o datos.");
-                        }
-                    }
-
-                    if (exito) {
-                        menuControlador.guardarDatos(); // Guardar automáticamente
-                        limpiarFormulario();
-                        actualizarTabla();
-                        actualizarAgendaDiaria();
-                    }
-                }
+            if (resultado.esExitoso()) {
+                menuControlador.guardarDatos(); // Guardar automáticamente
+                limpiarFormulario();
+                actualizarTabla();
+                actualizarAgendaDiaria();
+                JOptionPane.showMessageDialog(this, resultado.getMensaje());
+            } else {
+                JOptionPane.showMessageDialog(this, resultado.getMensaje());
             }
         });
 
@@ -222,10 +205,15 @@ public class CitaVista extends JPanel {
                 int citaId = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
                 Cita cita = controlador.buscarCitaPorId(citaId);
 
-                if (cita != null && cita.getEstado() != null && cita.getEstado().permiteModificacion()) {
-                    cargarCitaEnFormulario(cita);
+                if (cita != null) {
+                    ResultadoOperacion resultado = controlador.puedeEditarCita(citaId);
+                    if (resultado.esExitoso()) {
+                        cargarCitaEnFormulario(cita);
+                    } else {
+                        JOptionPane.showMessageDialog(this, resultado.getMensaje());
+                    }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Solo se pueden editar citas programadas");
+                    JOptionPane.showMessageDialog(this, "Cita no encontrada");
                 }
             } else {
                 JOptionPane.showMessageDialog(this, "Seleccione una cita para editar");
@@ -236,33 +224,34 @@ public class CitaVista extends JPanel {
             int filaSeleccionada = tablaCitas.getSelectedRow();
             if (filaSeleccionada != -1) {
                 int citaId = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
-                Cita cita = controlador.buscarCitaPorId(citaId);
-
-                if (cita != null && cita.getEstado() != null && cita.getEstado().permiteModificacion()) {
-                    String[] opciones = {"Completada", "Cancelada"};
-                    int opcion = JOptionPane.showOptionDialog(this,
-                            "Seleccione el nuevo estado:",
-                            "Cambiar Estado",
-                            JOptionPane.YES_NO_OPTION,
-                            JOptionPane.QUESTION_MESSAGE,
-                            null,
-                            opciones,
-                            opciones[0]);
-
-                    if (opcion == 0) {
-                        controlador.cambiarEstado(citaId, new EstadoCitaCompletada());
-                        menuControlador.guardarDatos(); // Guardar automáticamente
-                        JOptionPane.showMessageDialog(this, "Cita marcada como completada");
-                    } else if (opcion == 1) {
-                        controlador.cambiarEstado(citaId, new EstadoCitaCancelada());
-                        menuControlador.guardarDatos(); // Guardar automáticamente
-                        JOptionPane.showMessageDialog(this, "Cita cancelada");
-                    }
-                    actualizarTabla();
-                    actualizarAgendaDiaria();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Solo se puede cambiar el estado de citas programadas");
+                
+                ResultadoOperacion validacion = controlador.puedeCambiarEstado(citaId);
+                if (!validacion.esExitoso()) {
+                    JOptionPane.showMessageDialog(this, validacion.getMensaje());
+                    return;
                 }
+
+                String[] opciones = {"Completada", "Cancelada"};
+                int opcion = JOptionPane.showOptionDialog(this,
+                        "Seleccione el nuevo estado:",
+                        "Cambiar Estado",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        opciones,
+                        opciones[0]);
+
+                if (opcion == 0) {
+                    controlador.cambiarEstado(citaId, new EstadoCitaCompletada());
+                    menuControlador.guardarDatos(); // Guardar automáticamente
+                    JOptionPane.showMessageDialog(this, "Cita marcada como completada");
+                } else if (opcion == 1) {
+                    controlador.cambiarEstado(citaId, new EstadoCitaCancelada());
+                    menuControlador.guardarDatos(); // Guardar automáticamente
+                    JOptionPane.showMessageDialog(this, "Cita cancelada");
+                }
+                actualizarTabla();
+                actualizarAgendaDiaria();
             } else {
                 JOptionPane.showMessageDialog(this, "Seleccione una cita para cambiar su estado");
             }
@@ -298,49 +287,6 @@ public class CitaVista extends JPanel {
         btnCancelar.setEnabled(true);
     }
 
-    private boolean validarFormulario() {
-        if (comboCliente.getSelectedItem() == null) {
-            JOptionPane.showMessageDialog(this, "Seleccione un cliente");
-            return false;
-        }
-        if (comboServicio.getSelectedItem() == null) {
-            JOptionPane.showMessageDialog(this, "Seleccione un servicio");
-            return false;
-        }
-        if (txtFecha.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingrese una fecha");
-            return false;
-        }
-        return true;
-    }
-
-    private LocalDate parsearFecha(String fechaStr) {
-        try {
-            return LocalDate.parse(fechaStr, DateTimeFormatter.ISO_DATE);
-        } catch (DateTimeParseException e) {
-            JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use YYYY-MM-DD");
-            return null;
-        }
-    }
-
-    private LocalTime parsearHora(JSpinner spinner) {
-        try {
-            java.util.Date fecha = (java.util.Date) spinner.getValue();
-            java.util.Calendar cal = java.util.Calendar.getInstance();
-            cal.setTime(fecha);
-            return LocalTime.of(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE));
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al leer la hora");
-            return null;
-        }
-    }
-
-    private int obtenerIdSeleccionado(String item) {
-        if (item != null && item.contains(" - ")) {
-            return Integer.parseInt(item.split(" - ")[0]);
-        }
-        return -1;
-    }
 
     private void actualizarComboClientes() {
         modeloClientes.removeAllElements();
@@ -374,7 +320,13 @@ public class CitaVista extends JPanel {
     }
 
     private void actualizarAgendaDiaria() {
-        LocalDate fecha = parsearFecha(txtFechaAgenda.getText());
+        LocalDate fecha = null;
+        try {
+            fecha = LocalDate.parse(txtFechaAgenda.getText().trim());
+        } catch (Exception e) {
+            // Si no se puede parsear, no actualizar
+            return;
+        }
         if (fecha != null) {
             modeloTabla.setRowCount(0);
             List<Cita> citas = controlador.obtenerAgendaDiaria(fecha);
