@@ -2,6 +2,7 @@ package org.usil.Vista;
 
 import org.usil.Controlador.ClienteControlador;
 import org.usil.Controlador.MenuPrincipalControlador;
+import org.usil.Controlador.ResultadoOperacion;
 import org.usil.Modelo.Cliente;
 
 import javax.swing.*;
@@ -54,14 +55,19 @@ public class ClienteVista extends JPanel {
         btnAgregar.addActionListener(e -> {
             String nombre = txtNombre.getText();
             String telefono = txtTelefono.getText();
-            if (!nombre.isEmpty() && !telefono.isEmpty()) {
-                controlador.agregarCliente(nombre, telefono);
+            
+            ResultadoOperacion resultado = controlador.validarYAgregarCliente(nombre, telefono);
+            
+            if (resultado.esExitoso()) {
                 menuControlador.guardarDatos(); // Guardar automáticamente
                 actualizarTabla();
                 txtNombre.setText("");
                 txtTelefono.setText("");
+                if (resultado.getMensaje() != null) {
+                    JOptionPane.showMessageDialog(this, resultado.getMensaje());
+                }
             } else {
-                JOptionPane.showMessageDialog(this, "Completa todos los campos");
+                JOptionPane.showMessageDialog(this, resultado.getMensaje());
             }
         });
 

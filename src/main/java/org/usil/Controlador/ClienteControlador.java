@@ -15,6 +15,19 @@ public class ClienteControlador {
         listaClientes.add(nuevo);
     }
 
+    // Validar y agregar cliente (retorna resultado con mensaje)
+    public ResultadoOperacion validarYAgregarCliente(String nombre, String telefono) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return ResultadoOperacion.error("El nombre es obligatorio");
+        }
+        if (telefono == null || telefono.trim().isEmpty()) {
+            return ResultadoOperacion.error("El teléfono es obligatorio");
+        }
+        
+        agregarCliente(nombre.trim(), telefono.trim());
+        return ResultadoOperacion.exito("Cliente agregado exitosamente");
+    }
+
     // Agregar cliente con fecha de registro específica (para cargar desde archivo)
     public void agregarClienteConFecha(int id, String nombre, String telefono, LocalDate fechaRegistro) {
         Cliente nuevo = new Cliente(id, nombre, telefono, fechaRegistro);
