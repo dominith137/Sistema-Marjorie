@@ -124,9 +124,20 @@ public class ReporteControlador {
         return generarReporteCitas(fechaInicio, fechaFin);
     }
 
-    // Exportar en PDF usando Factory
-    public void exportarPDF(Reporte reporte) {
-        ReporteFormato formato = (ReporteFormato) ReporteFactory.crearReporte("pdf");
+    // Contexto del patrón Strategy: decide qué formato usar
+    public void exportarReporte(Reporte reporte, String tipoFormato) {
+        if (reporte == null) {
+            throw new IllegalArgumentException("El reporte no puede ser nulo");
+        }
+        ReporteFormato formato = ReporteFactory.crearFormato(tipoFormato);
         formato.generar(reporte);
+    }
+
+    public void exportarPDF(Reporte reporte) {
+        exportarReporte(reporte, "pdf");
+    }
+
+    public void exportarConsola(Reporte reporte) {
+        exportarReporte(reporte, "consola");
     }
 }
