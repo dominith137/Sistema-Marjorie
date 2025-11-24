@@ -29,7 +29,7 @@ public class SistemaFacade {
     }
 
     public void registrarServicio(String nombre, double precio, int duracionMinutos) {
-        servicioControlador.agregarServicio(nombre, precio, duracionMinutos);
+        servicioControlador.agregarServicio(nombre, "", precio, duracionMinutos);
         gestorDatos.guardar(nombre); // usa Singleton
     }
 
