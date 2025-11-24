@@ -18,7 +18,7 @@ public class EstadoCitaProgramada implements EstadoCita{
 
     @Override
     public void completar(Cita cita) {
-        cita.setEstado(new EstadoCitaProgramada());
+        cita.setEstado(new EstadoCitaCompletada());
     }
 
     @Override
