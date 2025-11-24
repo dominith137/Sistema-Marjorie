@@ -76,6 +76,25 @@ public class MenuPrincipalVista extends JFrame {
         ReporteVista reportesPanel = new ReporteVista(controlador.getReporteControlador());
         tabbedPane.addTab("Reportes", reportesPanel);
 
+        // Listener para actualizar datos cuando se cambia de pestaña
+        tabbedPane.addChangeListener(e -> {
+            int indiceSeleccionado = tabbedPane.getSelectedIndex();
+            String tituloPestaña = tabbedPane.getTitleAt(indiceSeleccionado);
+            
+            // Actualizar datos cuando se entra a la pestaña de Citas
+            if ("Citas".equals(tituloPestaña)) {
+                citasPanel.actualizarDatos();
+            }
+            // Actualizar datos cuando se entra a la pestaña de Clientes
+            else if ("Clientes".equals(tituloPestaña)) {
+                clientesPanel.actualizarDatos();
+            }
+            // Actualizar datos cuando se entra a la pestaña de Servicios
+            else if ("Servicios".equals(tituloPestaña)) {
+                serviciosPanel.actualizarDatos();
+            }
+        });
+
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
         add(mainPanel);
