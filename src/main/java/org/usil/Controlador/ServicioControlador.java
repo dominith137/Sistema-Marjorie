@@ -95,6 +95,47 @@ public class ServicioControlador {
                 .toList();
     }
 
-    public void agregarServicio(String nombre, double precio, int duracionMinutos) {
+    // Validar y procesar servicio (agregar o actualizar)
+    public ResultadoOperacion validarYProcesarServicio(Integer idEdicion, String nombre, String descripcion, String precioStr, String duracionStr) {
+        // Validar campos obligatorios
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return ResultadoOperacion.error("El nombre es obligatorio");
+        }
+        if (precioStr == null || precioStr.trim().isEmpty()) {
+            return ResultadoOperacion.error("El precio es obligatorio");
+        }
+        if (duracionStr == null || duracionStr.trim().isEmpty()) {
+            return ResultadoOperacion.error("La duración es obligatoria");
+        }
+
+        // Parsear valores numéricos
+        double precio;
+        int duracion;
+        try {
+            precio = Double.parseDouble(precioStr.trim());
+            duracion = Integer.parseInt(duracionStr.trim());
+        } catch (NumberFormatException e) {
+            return ResultadoOperacion.error("Ingrese valores numéricos válidos");
+        }
+
+        // Validar valores
+        if (precio <= 0) {
+            return ResultadoOperacion.error("El precio debe ser mayor a cero");
+        }
+        if (duracion <= 0) {
+            return ResultadoOperacion.error("La duración debe ser mayor a cero");
+        }
+
+        // Procesar según modo
+        boolean exito;
+        if (idEdicion != null) {
+            exito = actualizarServicio(idEdicion, nombre.trim(), descripcion, precio, duracion);
+            return exito ? ResultadoOperacion.exito("Servicio actualizado exitosamente") 
+                         : ResultadoOperacion.error("Error al actualizar el servicio");
+        } else {
+            exito = agregarServicio(nombre.trim(), descripcion, precio, duracion);
+            return exito ? ResultadoOperacion.exito("Servicio agregado exitosamente") 
+                         : ResultadoOperacion.error("Error al agregar el servicio");
+        }
     }
 }

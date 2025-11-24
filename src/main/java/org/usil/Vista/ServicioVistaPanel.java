@@ -2,6 +2,7 @@ package org.usil.Vista;
 
 import org.usil.Controlador.ServicioControlador;
 import org.usil.Controlador.MenuPrincipalControlador;
+import org.usil.Controlador.ResultadoOperacion;
 import org.usil.Modelo.Servicio;
 
 import javax.swing.*;
@@ -102,38 +103,17 @@ public class ServicioVistaPanel extends JPanel {
             String precioStr = txtPrecio.getText();
             String duracionStr = txtDuracion.getText();
             
-            if (!nombre.isEmpty() && !precioStr.isEmpty() && !duracionStr.isEmpty()) {
-                try {
-                    double precio = Double.parseDouble(precioStr);
-                    int duracion = Integer.parseInt(duracionStr);
-                    
-                    boolean exito = false;
-                    if (servicioEditandoId != null) {
-                        // Modo edición
-                        exito = controlador.actualizarServicio(servicioEditandoId, nombre, descripcion, precio, duracion);
-                        if (exito) {
-                            JOptionPane.showMessageDialog(this, "Servicio actualizado exitosamente");
-                        }
-                    } else {
-                        // Modo agregar
-                        exito = controlador.agregarServicio(nombre, descripcion, precio, duracion);
-                        if (exito) {
-                            JOptionPane.showMessageDialog(this, "Servicio agregado exitosamente");
-                        }
-                    }
-                    
-                    if (exito) {
-                        menuControlador.guardarDatos(); // Guardar automáticamente
-                        actualizarTabla();
-                        limpiarFormulario();
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Error al procesar el servicio");
-                    }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Ingrese valores numéricos válidos");
-                }
+            ResultadoOperacion resultado = controlador.validarYProcesarServicio(
+                servicioEditandoId, nombre, descripcion, precioStr, duracionStr
+            );
+            
+            if (resultado.esExitoso()) {
+                menuControlador.guardarDatos(); // Guardar automáticamente
+                actualizarTabla();
+                limpiarFormulario();
+                JOptionPane.showMessageDialog(this, resultado.getMensaje());
             } else {
-                JOptionPane.showMessageDialog(this, "Complete los campos obligatorios");
+                JOptionPane.showMessageDialog(this, resultado.getMensaje());
             }
         });
 
