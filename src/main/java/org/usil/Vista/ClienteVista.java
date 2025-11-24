@@ -1,6 +1,7 @@
 package org.usil.Vista;
 
 import org.usil.Controlador.ClienteControlador;
+import org.usil.Controlador.MenuPrincipalControlador;
 import org.usil.Modelo.Cliente;
 
 import javax.swing.*;
@@ -10,13 +11,15 @@ import java.util.List;
 
 public class ClienteVista extends JPanel {
     private ClienteControlador controlador;
+    private MenuPrincipalControlador menuControlador;
     private JTextField txtNombre;
     private JTextField txtTelefono;
     private JTable tablaClientes;
     private DefaultTableModel modeloTabla;
 
-    public ClienteVista(ClienteControlador controlador) {
+    public ClienteVista(ClienteControlador controlador, MenuPrincipalControlador menuControlador) {
         this.controlador = controlador;
+        this.menuControlador = menuControlador;
         initComponents();
         actualizarTabla();
     }
@@ -53,6 +56,7 @@ public class ClienteVista extends JPanel {
             String telefono = txtTelefono.getText();
             if (!nombre.isEmpty() && !telefono.isEmpty()) {
                 controlador.agregarCliente(nombre, telefono);
+                menuControlador.guardarDatos(); // Guardar automáticamente
                 actualizarTabla();
                 txtNombre.setText("");
                 txtTelefono.setText("");
@@ -67,6 +71,7 @@ public class ClienteVista extends JPanel {
             if (filaSeleccionada != -1) {
                 int id = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
                 controlador.eliminarCliente(id);
+                menuControlador.guardarDatos(); // Guardar automáticamente
                 actualizarTabla();
             } else {
                 JOptionPane.showMessageDialog(this, "Selecciona un cliente para eliminar");
