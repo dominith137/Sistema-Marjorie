@@ -1,2 +1,4 @@
-1;peinado;lashes;20.0;30;true
+1;Peinado;Lashes;20.0;30;true
 2;Balayage;color caramelo;200.0;180;true
+3;Planchado de Cejas;ejemplo;100.0;50;true
+4;Pigmentacion de Cejas;descripcion1;50.0;60;true
