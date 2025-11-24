@@ -18,6 +18,7 @@ public class ClienteVista extends JPanel {
     public ClienteVista(ClienteControlador controlador) {
         this.controlador = controlador;
         initComponents();
+        actualizarTabla();
     }
 
     private void initComponents() {
