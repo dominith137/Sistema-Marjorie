@@ -1,6 +1,7 @@
 package org.usil.Controlador;
 
 import org.usil.Modelo.Cliente;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,16 @@ public class ClienteControlador {
     public void agregarCliente(String nombre, String telefono) {
         Cliente nuevo = new Cliente(contadorId++, nombre, telefono);
         listaClientes.add(nuevo);
+    }
+
+    // Agregar cliente con fecha de registro específica (para cargar desde archivo)
+    public void agregarClienteConFecha(int id, String nombre, String telefono, LocalDate fechaRegistro) {
+        Cliente nuevo = new Cliente(id, nombre, telefono, fechaRegistro);
+        listaClientes.add(nuevo);
+        // Actualizar contadorId si es necesario
+        if (id >= contadorId) {
+            contadorId = id + 1;
+        }
     }
 
     // Obtener todos los clientes
