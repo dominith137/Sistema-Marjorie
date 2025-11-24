@@ -1,4 +1,9 @@
-package org.usil.Modelo;
+package org.usil.Builder;
+
+import org.usil.Modelo.Cita;
+import org.usil.Modelo.Cliente;
+import org.usil.Modelo.Servicio;
+import org.usil.Modelo.EstadoCita;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,3 +21,4 @@ public interface CitaBuilder {
     // Devuelve la cita ya construida
     Cita build();
 }
+
