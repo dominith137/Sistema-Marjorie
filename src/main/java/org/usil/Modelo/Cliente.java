@@ -15,6 +15,14 @@ public class Cliente {
         this.fechaRegistro = LocalDate.now();
     }
 
+    // Constructor con fecha de registro específica (para cargar desde archivo)
+    public Cliente(int id, String nombreCompleto, String telefono, LocalDate fechaRegistro) {
+        this.id = id;
+        this.nombreCompleto = nombreCompleto;
+        this.telefono = telefono;
+        this.fechaRegistro = fechaRegistro;
+    }
+
     // Getters
     public int getId() { return id; }
     public String getNombreCompleto() { return nombreCompleto; }
