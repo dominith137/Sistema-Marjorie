@@ -6,10 +6,10 @@ import org.usil.Controlador.ServicioControlador;
 import org.usil.Modelo.Cita;
 import org.usil.Modelo.Cliente;
 import org.usil.Modelo.Servicio;
-import org.usil.Modelo.EstadoCita;
-import org.usil.Modelo.EstadoCitaProgramada;
-import org.usil.Modelo.EstadoCitaCompletada;
-import org.usil.Modelo.EstadoCitaCancelada;
+import org.usil.State.EstadoCita;
+import org.usil.State.EstadoCitaProgramada;
+import org.usil.State.EstadoCitaCompletada;
+import org.usil.State.EstadoCitaCancelada;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

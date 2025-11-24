@@ -1,5 +1,8 @@
 package org.usil.Modelo;
 
+import org.usil.State.EstadoCita;
+import org.usil.State.EstadoCitaProgramada;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 

@@ -3,7 +3,7 @@ package org.usil.Builder;
 import org.usil.Modelo.Cita;
 import org.usil.Modelo.Cliente;
 import org.usil.Modelo.Servicio;
-import org.usil.Modelo.EstadoCita;
+import org.usil.State.EstadoCita;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

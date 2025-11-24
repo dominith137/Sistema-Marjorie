@@ -3,6 +3,10 @@ package org.usil.Modelo;
 import org.usil.Controlador.ClienteControlador;
 import org.usil.Controlador.CitaControlador;
 import org.usil.Controlador.ServicioControlador;
+import org.usil.State.EstadoCita;
+import org.usil.State.EstadoCitaProgramada;
+import org.usil.State.EstadoCitaCompletada;
+import org.usil.State.EstadoCitaCancelada;
 
 import java.io.*;
 import java.time.LocalDate;

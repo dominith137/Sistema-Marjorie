@@ -1,4 +1,6 @@
-package org.usil.Modelo;
+package org.usil.State;
+
+import org.usil.Modelo.Cita;
 
 public interface EstadoCita {
 

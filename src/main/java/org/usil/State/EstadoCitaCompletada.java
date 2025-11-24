@@ -1,4 +1,6 @@
-package org.usil.Modelo;
+package org.usil.State;
+
+import org.usil.Modelo.Cita;
 
 public class EstadoCitaCompletada implements EstadoCita {
 
@@ -25,3 +27,4 @@ public class EstadoCitaCompletada implements EstadoCita {
     public void cancelar(Cita cita) {
     }
 }
+

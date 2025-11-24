@@ -2,13 +2,13 @@ package org.usil.Controlador;
 
 import org.usil.Modelo.Cita;
 import org.usil.Modelo.Cliente;
-import org.usil.Modelo.EstadoCita;
+import org.usil.State.EstadoCita;
 import org.usil.Modelo.Servicio;
 import org.usil.Builder.CitaBuilder;
 import org.usil.Builder.CitaConcreteBuilder;
-import org.usil.Modelo.EstadoCitaProgramada;
-import org.usil.Modelo.EstadoCitaCompletada;
-import org.usil.Modelo.EstadoCitaCancelada;
+import org.usil.State.EstadoCitaProgramada;
+import org.usil.State.EstadoCitaCompletada;
+import org.usil.State.EstadoCitaCancelada;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

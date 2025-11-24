@@ -1,28 +1,30 @@
-package org.usil.Modelo;
+package org.usil.State;
 
-public class EstadoCitaProgramada implements EstadoCita{
+import org.usil.Modelo.Cita;
+
+public class EstadoCitaCancelada implements EstadoCita {
+
     @Override
     public String getNombreEspanol() {
-        return "Pogramada";
+        return "Cancelada";
     }
 
     @Override
     public boolean permiteModificacion() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean permiteCancelacion() {
-        return true;
+        return false;
     }
 
     @Override
     public void completar(Cita cita) {
-        cita.setEstado(new EstadoCitaCompletada());
     }
 
     @Override
     public void cancelar(Cita cita) {
-        cita.setEstado(new EstadoCitaCancelada());
     }
 }
+
