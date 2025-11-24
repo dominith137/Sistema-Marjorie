@@ -4,6 +4,7 @@ import org.usil.Modelo.Cita;
 import org.usil.State.EstadoCita;
 import org.usil.Modelo.Reporte;
 import org.usil.Strategy.ReporteFormato;
+import org.usil.Factory.ReporteFactory;
 import org.usil.State.EstadoCitaCompletada;
 import org.usil.State.EstadoCitaCancelada;
 

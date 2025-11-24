@@ -1,4 +1,4 @@
-package org.usil.Controlador;
+package org.usil.Factory;
 
 import org.usil.Strategy.ReporteFormato;
 import org.usil.Strategy.ReportePDF;
@@ -20,3 +20,4 @@ public class ReporteFactory {
         throw new IllegalArgumentException("Tipo de formato no soportado: " + tipo);
     }
 }
+

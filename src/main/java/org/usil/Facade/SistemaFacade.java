@@ -1,5 +1,8 @@
-package org.usil.Controlador;
+package org.usil.Facade;
 
+import org.usil.Controlador.ClienteControlador;
+import org.usil.Controlador.ServicioControlador;
+import org.usil.Controlador.CitaControlador;
 import org.usil.Modelo.Cita;
 import org.usil.State.EstadoCita;
 import org.usil.Singleton.GestorDatos;
@@ -51,3 +54,4 @@ public class SistemaFacade {
         return citaControlador.obtenerTodasLasCitas();
     }
 }
+
