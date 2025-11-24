@@ -8,6 +8,8 @@ import org.usil.Modelo.ReporteFormato;
 import org.usil.Modelo.EstadoCitaCompletada;
 import org.usil.Modelo.EstadoCitaCancelada;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -125,19 +127,19 @@ public class ReporteControlador {
     }
 
     // Contexto del patrón Strategy: decide qué formato usar
-    public void exportarReporte(Reporte reporte, String tipoFormato) {
+    public void exportarReporte(Reporte reporte, String tipoFormato, File archivoDestino) throws IOException {
         if (reporte == null) {
             throw new IllegalArgumentException("El reporte no puede ser nulo");
         }
         ReporteFormato formato = ReporteFactory.crearFormato(tipoFormato);
-        formato.generar(reporte);
+        formato.generar(reporte, archivoDestino);
     }
 
-    public void exportarPDF(Reporte reporte) {
-        exportarReporte(reporte, "pdf");
+    public void exportarPDF(Reporte reporte, File archivoDestino) throws IOException {
+        exportarReporte(reporte, "pdf", archivoDestino);
     }
 
-    public void exportarConsola(Reporte reporte) {
-        exportarReporte(reporte, "consola");
+    public void exportarConsola(Reporte reporte) throws IOException {
+        exportarReporte(reporte, "consola", null);
     }
 }

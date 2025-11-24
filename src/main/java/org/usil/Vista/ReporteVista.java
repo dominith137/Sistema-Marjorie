@@ -26,6 +26,8 @@ public class ReporteVista extends JPanel {
     private JButton btnExportar;
     private JButton btnExportarPDF;
 
+    private Reporte reporteActual;
+
     public ReporteVista(ReporteControlador controlador) {
         this.controlador = controlador;
         initComponents();
@@ -89,9 +91,10 @@ public class ReporteVista extends JPanel {
         btnExportar = new JButton("Exportar CSV");
         btnExportarPDF = new JButton("Exportar PDF");
         btnExportar.setEnabled(false);
+        btnExportarPDF.setEnabled(false);
+
         botonesPanel.add(btnGenerar);
         botonesPanel.add(btnExportar);
-        btnExportarPDF.setEnabled(false); // solo se activa si hay reporte
         botonesPanel.add(btnExportarPDF);
 
         panel.add(form, BorderLayout.CENTER);
@@ -100,6 +103,7 @@ public class ReporteVista extends JPanel {
         // Acciones
         btnGenerar.addActionListener(e -> generarReporte());
         btnExportar.addActionListener(e -> exportarCSV());
+        btnExportarPDF.addActionListener(e -> exportarPDF());
 
         return panel;
     }
@@ -171,12 +175,17 @@ public class ReporteVista extends JPanel {
                 break;
             case "Servicios Más Solicitados":
                 mostrarServiciosMasSolicitados(fechaInicio, fechaFin);
+                this.reporteActual = null;
+                btnExportar.setEnabled(false);
+                btnExportarPDF.setEnabled(false);
                 return;
         }
 
         if (reporte != null) {
+            this.reporteActual = reporte;
             mostrarReporte(reporte);
             btnExportar.setEnabled(true);
+            btnExportarPDF.setEnabled(true);
         }
     }
 
@@ -219,9 +228,14 @@ public class ReporteVista extends JPanel {
         // Limpiar tabla
         modeloTabla.setRowCount(0);
         btnExportar.setEnabled(false);
+        btnExportarPDF.setEnabled(false);
     }
 
     private void exportarCSV() {
+        if (modeloTabla.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "No hay datos para exportar.");
+            return;
+        }
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Reporte CSV");
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV Files", "csv"));
@@ -260,6 +274,42 @@ public class ReporteVista extends JPanel {
         }
     }
 
+    private void exportarPDF() {
+        if (reporteActual == null) {
+            JOptionPane.showMessageDialog(this,
+                    "No hay un reporte generado para exportar.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Reporte en PDF");
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Archivos PDF", "pdf"));
+
+        int resultado = fileChooser.showSaveDialog(this);
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+            try {
+                java.io.File archivo = fileChooser.getSelectedFile();
+                if (!archivo.getName().toLowerCase().endsWith(".pdf")) {
+                    archivo = new java.io.File(archivo.getAbsolutePath() + ".pdf");
+                }
+
+                controlador.exportarPDF(reporteActual, archivo);
+
+                JOptionPane.showMessageDialog(this,
+                        "Reporte exportado exitosamente a:\n" + archivo.getAbsolutePath(),
+                        "Exportación PDF",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                        "Error al exportar el PDF: " + e.getMessage(),
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
     private LocalDate parsearFecha(String fechaStr) {
         try {
             return LocalDate.parse(fechaStr, DateTimeFormatter.ISO_DATE);
@@ -269,6 +319,6 @@ public class ReporteVista extends JPanel {
     }
 
     public void actualizarDatos() {
-        // Actualizar si hay datos cargados
+        // Aquí podrías refrescar algo si fuera necesario
     }
 }

@@ -1,8 +1,8 @@
 package org.usil.Modelo;
 
-/**
- * Interfaz para formatos de salida de reportes (PDF, Excel, etc.)
- */
+import java.io.File;
+import java.io.IOException;
+
 public interface ReporteFormato {
-    void generar(Reporte reporte);
+    void generar(Reporte reporte, File archivoDestino) throws IOException;
 }
