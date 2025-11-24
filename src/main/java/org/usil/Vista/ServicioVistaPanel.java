@@ -1,6 +1,7 @@
 package org.usil.Vista;
 
 import org.usil.Controlador.ServicioControlador;
+import org.usil.Controlador.MenuPrincipalControlador;
 import org.usil.Modelo.Servicio;
 
 import javax.swing.*;
@@ -10,6 +11,7 @@ import java.util.List;
 
 public class ServicioVistaPanel extends JPanel {
     private ServicioControlador controlador;
+    private MenuPrincipalControlador menuControlador;
     private JTextField txtNombre;
     private JTextField txtDescripcion;
     private JTextField txtPrecio;
@@ -22,8 +24,9 @@ public class ServicioVistaPanel extends JPanel {
     private JButton btnCancelar;
     private Integer servicioEditandoId = null;
 
-    public ServicioVistaPanel(ServicioControlador controlador) {
+    public ServicioVistaPanel(ServicioControlador controlador, MenuPrincipalControlador menuControlador) {
         this.controlador = controlador;
+        this.menuControlador = menuControlador;
         initComponents();
     }
 
@@ -120,6 +123,7 @@ public class ServicioVistaPanel extends JPanel {
                     }
                     
                     if (exito) {
+                        menuControlador.guardarDatos(); // Guardar automáticamente
                         actualizarTabla();
                         limpiarFormulario();
                     } else {
@@ -155,6 +159,7 @@ public class ServicioVistaPanel extends JPanel {
                 
                 if (opcion == JOptionPane.YES_OPTION) {
                     if (controlador.alternarEstadoServicio(id)) {
+                        menuControlador.guardarDatos(); // Guardar automáticamente
                         actualizarTabla();
                         String nuevoEstado = estaActivo ? "desactivado" : "activado";
                         JOptionPane.showMessageDialog(this, "Servicio " + nuevoEstado + " exitosamente");

@@ -19,29 +19,24 @@ public class MenuPrincipalVista extends JFrame {
         configurarCierre();
     }
 
-    // Configura el guardado automático al cerrar la ventana
+    // Configura el cierre de la ventana (los datos se guardan automáticamente)
     private void configurarCierre() {
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 int opcion = JOptionPane.showConfirmDialog(
                     MenuPrincipalVista.this,
-                    "¿Desea guardar los datos antes de salir?",
+                    "¿Desea salir del sistema?\n(Los datos se guardan automáticamente)",
                     "Confirmar salida",
-                    JOptionPane.YES_NO_CANCEL_OPTION
+                    JOptionPane.YES_NO_OPTION
                 );
                 
                 if (opcion == JOptionPane.YES_OPTION) {
+                    // Guardar una vez más por seguridad antes de cerrar
                     controlador.guardarDatos();
-                    JOptionPane.showMessageDialog(
-                        MenuPrincipalVista.this,
-                        "Datos guardados exitosamente"
-                    );
-                    System.exit(0);
-                } else if (opcion == JOptionPane.NO_OPTION) {
                     System.exit(0);
                 }
-                // Si es CANCEL, no hace nada y mantiene la ventana abierta
+                // Si es NO, no hace nada y mantiene la ventana abierta
             }
         });
     }
@@ -61,18 +56,19 @@ public class MenuPrincipalVista extends JFrame {
         tabbedPane.setFont(new Font("Arial", Font.BOLD, 14));
 
         // Pestaña de Clientes - Vista integrada
-        ClienteVista clientesPanel = new ClienteVista(controlador.getClienteControlador());
+        ClienteVista clientesPanel = new ClienteVista(controlador.getClienteControlador(), controlador);
         tabbedPane.addTab("Clientes", clientesPanel);
 
         // Pestaña de Servicios - Vista integrada
-        ServicioVistaPanel serviciosPanel = new ServicioVistaPanel(controlador.getServicioControlador());
+        ServicioVistaPanel serviciosPanel = new ServicioVistaPanel(controlador.getServicioControlador(), controlador);
         tabbedPane.addTab("Servicios", serviciosPanel);
 
         // Pestaña de Citas - Vista integrada
         CitaVista citasPanel = new CitaVista(
             controlador.getCitaControlador(),
             controlador.getClienteControlador(),
-            controlador.getServicioControlador()
+            controlador.getServicioControlador(),
+            controlador
         );
         tabbedPane.addTab("Citas", citasPanel);
 
