@@ -11,7 +11,6 @@ import java.awt.*;
 import java.util.List;
 
 public class ClienteVista extends JPanel {
-    private ClienteControlador controlador;
     private MenuPrincipalControlador menuControlador;
     private JTextField txtNombre;
     private JTextField txtTelefono;
@@ -19,7 +18,6 @@ public class ClienteVista extends JPanel {
     private DefaultTableModel modeloTabla;
 
     public ClienteVista(ClienteControlador controlador, MenuPrincipalControlador menuControlador) {
-        this.controlador = controlador;
         this.menuControlador = menuControlador;
         initComponents();
         actualizarTabla();
@@ -51,15 +49,14 @@ public class ClienteVista extends JPanel {
         tablaClientes = new JTable(modeloTabla);
         panel.add(new JScrollPane(tablaClientes), BorderLayout.CENTER);
 
-        // Acción del botón Agregar
+        // Acción del botón Agregar (usa Facade)
         btnAgregar.addActionListener(e -> {
             String nombre = txtNombre.getText();
             String telefono = txtTelefono.getText();
             
-            ResultadoOperacion resultado = controlador.validarYAgregarCliente(nombre, telefono);
+            ResultadoOperacion resultado = menuControlador.getSistemaFacade().registrarCliente(nombre, telefono);
             
             if (resultado.esExitoso()) {
-                menuControlador.guardarDatos(); // Guardar automáticamente
                 actualizarTabla();
                 txtNombre.setText("");
                 txtTelefono.setText("");
@@ -71,14 +68,17 @@ public class ClienteVista extends JPanel {
             }
         });
 
-        // Acción del botón Eliminar
+        // Acción del botón Eliminar (usa Facade)
         btnEliminar.addActionListener(e -> {
             int filaSeleccionada = tablaClientes.getSelectedRow();
             if (filaSeleccionada != -1) {
                 int id = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
-                controlador.eliminarCliente(id);
-                menuControlador.guardarDatos(); // Guardar automáticamente
-                actualizarTabla();
+                boolean exito = menuControlador.getSistemaFacade().eliminarCliente(id);
+                if (exito) {
+                    actualizarTabla();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error al eliminar el cliente");
+                }
             } else {
                 JOptionPane.showMessageDialog(this, "Selecciona un cliente para eliminar");
             }
@@ -89,7 +89,7 @@ public class ClienteVista extends JPanel {
 
     private void actualizarTabla() {
         modeloTabla.setRowCount(0); // Limpiar tabla
-        List<Cliente> clientes = controlador.obtenerClientes();
+        List<Cliente> clientes = menuControlador.getSistemaFacade().obtenerClientes();
         for (Cliente c : clientes) {
             modeloTabla.addRow(new Object[]{
                     c.getId(),
