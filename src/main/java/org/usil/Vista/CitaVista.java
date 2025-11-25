@@ -19,9 +19,6 @@ import java.util.List;
 
 // Vista para gestionar las citas del sistema
 public class CitaVista extends JPanel {
-    private CitaControlador controlador;
-    private ClienteControlador clienteControlador;
-    private ServicioControlador servicioControlador;
     private MenuPrincipalControlador menuControlador;
 
     private JComboBox<String> comboCliente;
@@ -44,9 +41,6 @@ public class CitaVista extends JPanel {
     private DefaultComboBoxModel<String> modeloServicios;
 
     public CitaVista(CitaControlador controlador, ClienteControlador clienteControlador, ServicioControlador servicioControlador, MenuPrincipalControlador menuControlador) {
-        this.controlador = controlador;
-        this.clienteControlador = clienteControlador;
-        this.servicioControlador = servicioControlador;
         this.menuControlador = menuControlador;
         initComponents();
     }
@@ -184,12 +178,11 @@ public class CitaVista extends JPanel {
             java.util.Date horaDate = (java.util.Date) spinnerHora.getValue();
             String observaciones = txtObservaciones.getText();
 
-            ResultadoOperacion resultado = controlador.validarYProcesarCita(
+            ResultadoOperacion resultado = menuControlador.getSistemaFacade().validarYProcesarCita(
                 citaEditandoId, clienteStr, servicioStr, fechaStr, horaDate, observaciones
             );
 
             if (resultado.esExitoso()) {
-                menuControlador.guardarDatos(); // Guardar automáticamente
                 limpiarFormulario();
                 actualizarTabla();
                 actualizarAgendaDiaria();
@@ -203,10 +196,10 @@ public class CitaVista extends JPanel {
             int filaSeleccionada = tablaCitas.getSelectedRow();
             if (filaSeleccionada != -1) {
                 int citaId = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
-                Cita cita = controlador.buscarCitaPorId(citaId);
+                Cita cita = menuControlador.getSistemaFacade().buscarCitaPorId(citaId);
 
                 if (cita != null) {
-                    ResultadoOperacion resultado = controlador.puedeEditarCita(citaId);
+                    ResultadoOperacion resultado = menuControlador.getSistemaFacade().puedeEditarCita(citaId);
                     if (resultado.esExitoso()) {
                         cargarCitaEnFormulario(cita);
                     } else {
@@ -225,7 +218,7 @@ public class CitaVista extends JPanel {
             if (filaSeleccionada != -1) {
                 int citaId = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
                 
-                ResultadoOperacion validacion = controlador.puedeCambiarEstado(citaId);
+                ResultadoOperacion validacion = menuControlador.getSistemaFacade().puedeCambiarEstado(citaId);
                 if (!validacion.esExitoso()) {
                     JOptionPane.showMessageDialog(this, validacion.getMensaje());
                     return;
@@ -242,13 +235,11 @@ public class CitaVista extends JPanel {
                         opciones[0]);
 
                 if (opcion == 0) {
-                    controlador.cambiarEstado(citaId, new EstadoCitaCompletada());
-                    menuControlador.guardarDatos(); // Guardar automáticamente
-                    JOptionPane.showMessageDialog(this, "Cita marcada como completada");
+                    ResultadoOperacion resultado = menuControlador.getSistemaFacade().cambiarEstadoCita(citaId, new EstadoCitaCompletada());
+                    JOptionPane.showMessageDialog(this, resultado.getMensaje());
                 } else if (opcion == 1) {
-                    controlador.cambiarEstado(citaId, new EstadoCitaCancelada());
-                    menuControlador.guardarDatos(); // Guardar automáticamente
-                    JOptionPane.showMessageDialog(this, "Cita cancelada");
+                    ResultadoOperacion resultado = menuControlador.getSistemaFacade().cambiarEstadoCita(citaId, new EstadoCitaCancelada());
+                    JOptionPane.showMessageDialog(this, resultado.getMensaje());
                 }
                 actualizarTabla();
                 actualizarAgendaDiaria();
@@ -290,7 +281,7 @@ public class CitaVista extends JPanel {
 
     private void actualizarComboClientes() {
         modeloClientes.removeAllElements();
-        List<Cliente> clientes = clienteControlador.obtenerClientes();
+        List<Cliente> clientes = menuControlador.getSistemaFacade().obtenerClientes();
         for (Cliente c : clientes) {
             modeloClientes.addElement(c.getId() + " - " + c.getNombreCompleto());
         }
@@ -298,7 +289,7 @@ public class CitaVista extends JPanel {
 
     private void actualizarComboServicios() {
         modeloServicios.removeAllElements();
-        List<Servicio> servicios = servicioControlador.obtenerServiciosActivos();
+        List<Servicio> servicios = menuControlador.getSistemaFacade().obtenerServiciosActivos();
         for (Servicio s : servicios) {
             modeloServicios.addElement(s.getId() + " - " + s.getNombre());
         }
@@ -306,7 +297,7 @@ public class CitaVista extends JPanel {
 
     private void actualizarTabla() {
         modeloTabla.setRowCount(0);
-        List<Cita> citas = controlador.obtenerTodasLasCitas();
+        List<Cita> citas = menuControlador.getSistemaFacade().obtenerTodasLasCitas();
         for (Cita c : citas) {
             modeloTabla.addRow(new Object[]{
                     c.getId(),
@@ -329,7 +320,7 @@ public class CitaVista extends JPanel {
         }
         if (fecha != null) {
             modeloTabla.setRowCount(0);
-            List<Cita> citas = controlador.obtenerAgendaDiaria(fecha);
+            List<Cita> citas = menuControlador.getSistemaFacade().obtenerAgendaDiaria(fecha);
             for (Cita c : citas) {
                 modeloTabla.addRow(new Object[]{
                         c.getId(),
