@@ -19,14 +19,14 @@ public class SistemaFacade {
     private ClienteControlador clienteControlador;
     private ServicioControlador servicioControlador;
     private CitaControlador citaControlador;
-    private GestorDatos gestorDatos;
+    private GestorDatos gestorDatos; // Singleton
 
     public SistemaFacade(ClienteControlador clienteControlador, ServicioControlador servicioControlador, 
-                        CitaControlador citaControlador, GestorDatos gestorDatos) {
+                        CitaControlador citaControlador) {
         this.clienteControlador = clienteControlador;
         this.servicioControlador = servicioControlador;
         this.citaControlador = citaControlador;
-        this.gestorDatos = gestorDatos;
+        this.gestorDatos = GestorDatos.getInstancia(); // Usar Singleton directamente
     }
 
     // Operaciones de Cliente

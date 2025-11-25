@@ -12,13 +12,28 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-// Gestor de persistencia de datos en archivos de texto
+// Gestor de persistencia de datos en archivos de texto (Singleton)
 public class GestorDatos {
+    // Instancia única del Singleton
+    private static GestorDatos instancia;
+    
     private static final String DIRECTORIO_DATOS = "data";
     private static final String ARCHIVO_CLIENTES = "clientes.txt";
     private static final String ARCHIVO_SERVICIOS = "servicios.txt";
     private static final String ARCHIVO_CITAS = "citas.txt";
     private static final String DELIMITADOR = ";";
+
+    // Constructor privado para evitar instanciación directa
+    private GestorDatos() {
+    }
+
+    // Método público para obtener la instancia única
+    public static GestorDatos getInstancia() {
+        if (instancia == null) {
+            instancia = new GestorDatos();
+        }
+        return instancia;
+    }
 
     // Guarda todos los clientes en archivo
     public boolean guardarClientes(ClienteControlador controlador) {

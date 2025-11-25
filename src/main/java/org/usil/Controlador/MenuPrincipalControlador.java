@@ -13,8 +13,8 @@ public class MenuPrincipalControlador {
     private SistemaFacade sistemaFacade;
 
     public MenuPrincipalControlador() {
-        // Inicializar gestor de datos
-        this.gestorDatos = new GestorDatos();
+        // Inicializar gestor de datos (Singleton)
+        this.gestorDatos = GestorDatos.getInstancia();
         
         // Inicializar controladores base
         this.clienteControlador = new ClienteControlador();
@@ -31,8 +31,8 @@ public class MenuPrincipalControlador {
         // Cargar citas después de inicializar el controlador
         gestorDatos.cargarCitas(citaControlador, clienteControlador, servicioControlador);
         
-        // Inicializar Facade con los controladores y gestor de datos
-        this.sistemaFacade = new SistemaFacade(clienteControlador, servicioControlador, citaControlador, gestorDatos);
+        // Inicializar Facade con los controladores (el Facade obtiene el Singleton internamente)
+        this.sistemaFacade = new SistemaFacade(clienteControlador, servicioControlador, citaControlador);
     }
 
     // Guarda todos los datos en archivos (usa Facade internamente)
