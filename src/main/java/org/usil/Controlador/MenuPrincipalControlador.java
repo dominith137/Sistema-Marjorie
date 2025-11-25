@@ -1,5 +1,6 @@
 package org.usil.Controlador;
 
+import org.usil.Facade.SistemaFacade;
 import org.usil.Modelo.GestorDatos;
 
 // Controlador principal que coordina todos los módulos del sistema
@@ -9,6 +10,7 @@ public class MenuPrincipalControlador {
     private CitaControlador citaControlador;
     private ReporteControlador reporteControlador;
     private GestorDatos gestorDatos;
+    private SistemaFacade sistemaFacade;
 
     public MenuPrincipalControlador() {
         // Inicializar gestor de datos
@@ -28,13 +30,14 @@ public class MenuPrincipalControlador {
         
         // Cargar citas después de inicializar el controlador
         gestorDatos.cargarCitas(citaControlador, clienteControlador, servicioControlador);
+        
+        // Inicializar Facade con los controladores y gestor de datos
+        this.sistemaFacade = new SistemaFacade(clienteControlador, servicioControlador, citaControlador, gestorDatos);
     }
 
-    // Guarda todos los datos en archivos
+    // Guarda todos los datos en archivos (usa Facade internamente)
     public void guardarDatos() {
-        gestorDatos.guardarClientes(clienteControlador);
-        gestorDatos.guardarServicios(servicioControlador);
-        gestorDatos.guardarCitas(citaControlador, clienteControlador, servicioControlador);
+        sistemaFacade.guardarTodosLosDatos();
     }
 
     // Getters para acceso a los controladores desde otras partes del sistema
@@ -56,5 +59,9 @@ public class MenuPrincipalControlador {
 
     public GestorDatos getGestorDatos() {
         return gestorDatos;
+    }
+
+    public SistemaFacade getSistemaFacade() {
+        return sistemaFacade;
     }
 }
