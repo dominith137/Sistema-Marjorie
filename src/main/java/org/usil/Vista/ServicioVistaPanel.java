@@ -11,7 +11,6 @@ import java.awt.*;
 import java.util.List;
 
 public class ServicioVistaPanel extends JPanel {
-    private ServicioControlador controlador;
     private MenuPrincipalControlador menuControlador;
     private JTextField txtNombre;
     private JTextField txtDescripcion;
@@ -26,7 +25,6 @@ public class ServicioVistaPanel extends JPanel {
     private Integer servicioEditandoId = null;
 
     public ServicioVistaPanel(ServicioControlador controlador, MenuPrincipalControlador menuControlador) {
-        this.controlador = controlador;
         this.menuControlador = menuControlador;
         initComponents();
     }
@@ -72,12 +70,12 @@ public class ServicioVistaPanel extends JPanel {
         tablaServicios = new JTable(modeloTabla);
         panel.add(new JScrollPane(tablaServicios), BorderLayout.CENTER);
 
-        // Acción del botón Editar
+        // Acción del botón Editar (usa Facade)
         btnEditar.addActionListener(e -> {
             int filaSeleccionada = tablaServicios.getSelectedRow();
             if (filaSeleccionada != -1) {
                 int id = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
-                Servicio servicio = controlador.buscarServicioPorId(id);
+                Servicio servicio = menuControlador.getSistemaFacade().buscarServicioPorId(id);
                 
                 if (servicio != null) {
                     servicioEditandoId = id;
@@ -96,19 +94,37 @@ public class ServicioVistaPanel extends JPanel {
             }
         });
 
-        // Acción del botón Agregar/Guardar
+        // Acción del botón Agregar/Guardar (usa Facade)
         btnAgregar.addActionListener(e -> {
             String nombre = txtNombre.getText();
             String descripcion = txtDescripcion.getText();
             String precioStr = txtPrecio.getText();
             String duracionStr = txtDuracion.getText();
             
-            ResultadoOperacion resultado = controlador.validarYProcesarServicio(
-                servicioEditandoId, nombre, descripcion, precioStr, duracionStr
-            );
+            ResultadoOperacion resultado;
+            if (servicioEditandoId != null) {
+                try {
+                    double precio = Double.parseDouble(precioStr);
+                    int duracion = Integer.parseInt(duracionStr);
+                    resultado = menuControlador.getSistemaFacade().actualizarServicio(
+                        servicioEditandoId, nombre, descripcion, precio, duracion
+                    );
+                } catch (NumberFormatException ex) {
+                    resultado = ResultadoOperacion.error("Ingrese valores numéricos válidos");
+                }
+            } else {
+                try {
+                    double precio = Double.parseDouble(precioStr);
+                    int duracion = Integer.parseInt(duracionStr);
+                    resultado = menuControlador.getSistemaFacade().registrarServicio(
+                        nombre, descripcion, precio, duracion
+                    );
+                } catch (NumberFormatException ex) {
+                    resultado = ResultadoOperacion.error("Ingrese valores numéricos válidos");
+                }
+            }
             
             if (resultado.esExitoso()) {
-                menuControlador.guardarDatos(); // Guardar automáticamente
                 actualizarTabla();
                 limpiarFormulario();
                 JOptionPane.showMessageDialog(this, resultado.getMensaje());
@@ -138,8 +154,7 @@ public class ServicioVistaPanel extends JPanel {
                     JOptionPane.YES_NO_OPTION);
                 
                 if (opcion == JOptionPane.YES_OPTION) {
-                    if (controlador.alternarEstadoServicio(id)) {
-                        menuControlador.guardarDatos(); // Guardar automáticamente
+                    if (menuControlador.getSistemaFacade().alternarEstadoServicio(id)) {
                         actualizarTabla();
                         String nuevoEstado = estaActivo ? "desactivado" : "activado";
                         JOptionPane.showMessageDialog(this, "Servicio " + nuevoEstado + " exitosamente");
@@ -160,7 +175,7 @@ public class ServicioVistaPanel extends JPanel {
 
     private void actualizarTabla() {
         modeloTabla.setRowCount(0); // Limpiar tabla
-        List<Servicio> servicios = controlador.obtenerTodosLosServicios();
+        List<Servicio> servicios = menuControlador.getSistemaFacade().obtenerServicios();
         for (Servicio s : servicios) {
             modeloTabla.addRow(new Object[]{
                     s.getId(),
