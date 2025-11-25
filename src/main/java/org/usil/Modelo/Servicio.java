@@ -1,5 +1,7 @@
 package org.usil.Modelo;
 
+import org.usil.State.EstadoServicio;
+import org.usil.State.EstadoServicioActivo;
 
 public class Servicio {
     private int id;
@@ -7,7 +9,7 @@ public class Servicio {
     private String descripcion;
     private double precio;
     private int duracionMinutos;
-    private boolean activo;
+    private EstadoServicio estado;
 
     public Servicio(int id, String nombre, String descripcion, double precio, int duracionMinutos) {
         this.id = id;
@@ -15,7 +17,7 @@ public class Servicio {
         this.descripcion = descripcion;
         this.precio = precio;
         this.duracionMinutos = duracionMinutos;
-        this.activo = true; // Por defecto, los servicios están activos
+        this.estado = new EstadoServicioActivo(); // Por defecto, los servicios están activos
     }
 
     // Getters
@@ -24,7 +26,8 @@ public class Servicio {
     public String getDescripcion() { return descripcion; }
     public double getPrecio() { return precio; }
     public int getDuracionMinutos() { return duracionMinutos; }
-    public boolean isActivo() { return activo; }
+    public EstadoServicio getEstado() { return estado; }
+    public boolean isActivo() { return estado.estaActivo(); }
 
     // Setters
     public void setNombre(String nombre) {
@@ -43,18 +46,18 @@ public class Servicio {
         this.duracionMinutos = duracionMinutos;
     }
 
-    public void setActivo(boolean activo) {
-        this.activo = activo;
+    public void setEstado(EstadoServicio estado) {
+        this.estado = estado;
     }
 
     // Método para desactivar servicio
     public void desactivar() {
-        this.activo = false;
+        estado.desactivar(this);
     }
 
     // Método para reactivar servicio
     public void reactivar() {
-        this.activo = true;
+        estado.activar(this);
     }
 
     @Override
@@ -65,7 +68,7 @@ public class Servicio {
                 ", descripcion='" + descripcion + '\'' +
                 ", precio=" + precio +
                 ", duracionMinutos=" + duracionMinutos +
-                ", activo=" + activo +
+                ", estado=" + estado.getNombre() +
                 '}';
     }
 }

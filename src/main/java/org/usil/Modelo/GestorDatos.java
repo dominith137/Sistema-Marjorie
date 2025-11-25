@@ -7,6 +7,7 @@ import org.usil.State.EstadoCita;
 import org.usil.State.EstadoCitaProgramada;
 import org.usil.State.EstadoCitaCompletada;
 import org.usil.State.EstadoCitaCancelada;
+import org.usil.State.EstadoServicioInactivo;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -139,8 +140,12 @@ public class GestorDatos {
                         boolean activo = partes.length > 5 ? Boolean.parseBoolean(partes[5].trim()) : true;
 
                         controlador.agregarServicio(nombre, descripcion, precio, duracion);
+                        // Obtener el último servicio agregado y establecer su estado
+                        Servicio servicio = controlador.obtenerTodosLosServicios().get(
+                            controlador.obtenerTodosLosServicios().size() - 1
+                        );
                         if (!activo) {
-
+                            servicio.setEstado(new EstadoServicioInactivo());
                         }
                     } catch (Exception e) {
                         System.err.println("Error al cargar servicio: " + linea);
